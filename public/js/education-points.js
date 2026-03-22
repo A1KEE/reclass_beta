@@ -328,8 +328,9 @@ function evaluateEducation() {
     const education = $('#education_name').val().trim().toLowerCase();
     const selectedUnits = getFinalUnits();
 
-    if (!education) {
-        $('#education_remark').html('<span class="text-muted">Waiting for QS</span>');
+    // 🔥 FIX: If kulang pa inputs → WAITING
+    if (!education || !selectedUnits) {
+        $('#modal_education_remark').html('<span class="text-muted">Waiting for the QS</span>');
         return;
     }
 
@@ -359,18 +360,18 @@ function evaluateEducation() {
 if (!isEducationDegree(education) && position.includes('teacher')) {
 
     if (userLevel >= 11) {
-        $('#education_remark').html('<span class="text-success fw-bold">MET</span>');
+        $('#modal_education_remark').html('<span class="text-success fw-bold">MET</span>');
     } else {
-        $('#education_remark').html('<span class="text-danger fw-bold">NOT MET</span>');
+        $('#modal_education_remark').html('<span class="text-danger fw-bold">NOT MET</span>');
     }
 
     return; // STOP evaluation here
 }
 
     if (isDegreeValid && userLevel >= requiredLevel) {
-        $('#education_remark').html(`<span class="text-success fw-bold">MET</span>`);
+        $('#modal_education_remark').html(`<span class="text-success fw-bold">MET</span>`);
     } else {
-        $('#education_remark').html(`<span class="text-danger fw-bold">NOT MET</span>`);
+        $('#modal_education_remark').html(`<span class="text-danger fw-bold">NOT MET</span>`);
     }
 }
 
@@ -392,13 +393,18 @@ function updateEducationSummaryLive() {
     $('#edu_level_display').text(unitsLabel);
     $('#edu_points_display').text(result.points);
 
-    let status = '';
+    let status = 'WAITING';
 
+// 🔥 If kulang pa → WAITING muna
+if (!name || !level) {
+    status = 'WAITING';
+} else {
     if (!isEducationDegree(name) && position.toLowerCase().includes('teacher')) {
         status = level >= 11 ? 'MET' : 'NOT MET';
     } else {
         status = result.userLevel >= result.requiredLevel ? 'MET' : 'NOT MET';
     }
+}
 
     if (status === 'MET') {
         $('#edu_status_display')

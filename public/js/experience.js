@@ -205,37 +205,52 @@ $('#addExperience').on('click', function() {
         </div>
 
         <!-- FILE UPLOAD -->
-        <div class="mb-2">
-          <label class="fw-bold">Upload Certificate (PDF)</label>
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="No file chosen" readonly id="file-display-${experienceIndex}">
-            <label class="btn btn-secondary mb-0">
-              Browse
-              <input type="file"
-                     name="experiences[${experienceIndex}][file]"
-                     class="exp_file"
-                     accept="application/pdf"
-                     style="display:none;"
-                     data-display="#file-display-${experienceIndex}"
-                     required>
-            </label>
-          </div>
-          <small class="text-muted">Accepted format: PDF only</small>
-        </div>
+       <div class="col-md-12">
+  <div class="form-group">
+    <label class="form-label fw-semibold mb-2">
+      <i class="fas fa-file-pdf me-2 text-danger"></i>Certificate (PDF)
+    </label>
 
+    <div class="file-upload-area border-dashed rounded-3 p-4 text-center bg-light">
+      
+      <div class="mb-3">
+        <i class="fas fa-cloud-upload-alt fa-2x text-muted"></i>
       </div>
+
+      <input type="file"
+             name="experiences[${experienceIndex}][file]"
+             class="form-control exp_file d-none"
+             accept="application/pdf"
+             required>
+
+      <button type="button" class="btn btn-outline-primary btn-sm choose-exp-file-btn">
+        <i class="fas fa-upload me-2"></i>Choose PDF File
+      </button>
+
+      <div class="form-text mt-2">
+        Maximum file size: 5MB. Only PDF files are accepted.
+      </div>
+
+      <div class="file-name mt-2 fw-semibold text-success"></div>
+
     </div>
+  </div>
+</div>
     `;
 
     $('#experienceContainer').append(html);
     experienceIndex++;
 });
 
-// UPDATE FILE DISPLAY NAME
+// CLICK BUTTON → OPEN FILE
+$(document).on('click', '.choose-exp-file-btn', function() {
+    $(this).closest('.file-upload-area').find('.exp_file').click();
+});
+
+// DISPLAY FILE NAME
 $(document).on('change', '.exp_file', function() {
     const fileName = this.files[0]?.name || '';
-    const displayId = $(this).data('display');
-    $(displayId).val(fileName);
+    $(this).closest('.file-upload-area').find('.file-name').text(fileName);
 });
 
 // ==========================

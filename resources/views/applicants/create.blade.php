@@ -256,9 +256,6 @@
         </div>
     </td>
     <td id="education_remark"><span class="text-muted">Waiting for the QS</span></td>
-     <!-- Hidden input for submission -->
-    <!-- <input type="hidden" name="qs_applicant_education" id="input_qs_education" value="">
-    <input type="hidden" name="remarks_education" id="input_remarks_education" value=""> -->
 </tr>
        <tr>
            <td>Training</td>
@@ -429,10 +426,19 @@
     @include('applicants.ppst-table')
 </div>
 
+<!-- === PRINT & SUBMIT BUTTONS === -->
+    <div class="text-center my-4">
+        <!-- <button type="button" class="btn btn-secondary me-2" onclick="window.print()">🖨️ Print</button> -->
+        <button type="button" id="submitBtn" class="btn btn-success">
+        💾 Submit Application
+    </button>
+</div>
+
 
 {{-- ========================================================= --}}
 {{-- III. COMPARATIVE ASSESSMENT RESULT --}}
 {{-- ========================================================= --}}
+<div id="hr-section" style="display:none;">
 <hr class="mt-5 mb-4">
 <h5 class="fw-bold text-uppercase">III. Comparative Assessment Result</h5>
 
@@ -455,12 +461,7 @@
         <td><input type="number" name="comparative[education]" class="form-control form-control-sm text-center" readonly></td>
         <td><input type="number" name="comparative[training]" class="form-control form-control-sm text-center" readonly></td>
         <td><input type="number" name="comparative[experience]" class="form-control form-control-sm text-center" readonly></td>
-        <td><input type="number" name="comparative[performance]" id="performanceFinal" class="form-control form-control-sm text-center" readonly><button type="button" 
-            class="btn btn-sm btn-outline-success"
-            data-bs-toggle="modal" 
-            data-bs-target="#performanceModal">
-        Compute
-    </button></td>
+        <td><input type="number" name="comparative[performance]" id="performanceFinal" class="form-control form-control-sm text-center" readonly><button type="button" class="btn btn-sm btn-outline-success"data-bs-toggle="modal" data-bs-target="#performanceModal">Compute</button></td>
         <td><input type="number" name="comparative[classroom]" class="form-control form-control-sm text-center" id="comparativeClassroom"value="0"></td>
         <td><input type="number" name="comparative[non_classroom]" class="form-control form-control-sm text-center"id="comparativeNonClassroom"value="0"></td>
         <td><input type="number" name="comparative[BEI]" class="form-control form-control-sm text-center"></td>
@@ -617,31 +618,45 @@
     <p class="small mb-0">Concurrent Officer-In-Charge, Office of the Assistant Secretary for Operations</p>
   </div>
 </div>
-
-<input type="hidden" name="qs_position_education" id="input_qs_position_education">
-<input type="hidden" name="qs_position_training" id="input_qs_position_training">
-<input type="hidden" name="qs_position_experience" id="input_qs_position_experience">
-<input type="hidden" name="qs_position_eligibility" id="input_qs_position_eligibility">
-
-<!-- === PRINT & SUBMIT BUTTONS === -->
-<div class="text-center my-4">
-    <button type="button" class="btn btn-secondary me-2" onclick="window.print()">🖨️ Print</button>
-    <button type="submit" form="applicantForm" class="btn btn-success">💾 Submit</button>
-</div>
         </form>
     </div>
+</div>
 </div>
 </div> <!-- /.container -->
 
 <div id="qsLoadingOverlay">
     <div class="qs-loader-wrapper">
-
         <img src="{{ asset('images/DO-LOGO.png') }}" class="loader-logo">
-
         <div class="qs-loading-text">
             Please wait while we load your Qualification Standards
         </div>
+    </div>
+</div>
 
+<!-- Submit Loader -->
+<div id="submitLoadingOverlay">
+    <div class="qs-loader-wrapper text-center">
+        <div class="logo-aura">
+            <img src="{{ asset('images/DO-LOGO.png') }}" class="loader-logo mb-3">
+        </div>
+
+        <div id="submitLottie" style="width:150px; height:150px; margin:auto;"></div>
+
+        <div class="qs-loading-text">
+            Submitting your application... Please wait.
+        </div>
+    </div>
+</div>
+
+<div id="evalLoadingOverlay">
+    <div class="qs-loader-wrapper">
+        <div class="logo-aura">
+            <img src="{{ asset('images/DO-LOGO.png') }}" class="loader-logo">
+        </div>
+        <div class="qs-loading-text">
+            Evaluating Qualifications<br>
+            Please wait while we check your records...
+        </div>
     </div>
 </div>
   
@@ -682,6 +697,7 @@
   <script src="{{ asset('js/indicators.js') }}"></script>
   <script src="{{ asset('js/fillout.js') }}"></script>
   <script src="{{ asset('js/performancerating.js') }}"></script>
+  <script src="{{ asset('js/form-submit.js') }}"></script>
 
   <script src="{{ asset('js/mapping-sg.js') }}"></script>
   <script src="{{ asset('js/position-ranking.js') }}"></script>
@@ -855,29 +871,56 @@
       }
   });
   </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
+ <script>
+document.addEventListener("DOMContentLoaded", function() {
 
-      lottie.loadAnimation({
-          container: document.getElementById('qsLottie'),
-          renderer: 'svg',
-          loop: true,
-          autoplay: true,
-          path: 'https://assets9.lottiefiles.com/packages/lf20_usmfx6bp.json'
-      });
+    // 🔹 QS Loader Lottie
+    if(document.getElementById('qsLottie')){
+        lottie.loadAnimation({
+            container: document.getElementById('qsLottie'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'https://assets9.lottiefiles.com/packages/lf20_usmfx6bp.json'
+        });
+    }
 
-  });
+    // 🔹 Submit Loader Lottie (optional, safe lang kahit di gamitin)
+    if(document.getElementById('submitLottie')){
+        lottie.loadAnimation({
+            container: document.getElementById('submitLottie'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'https://assets9.lottiefiles.com/packages/lf20_usmfx6bp.json'
+        });
+    }
 
-  function showQSLoading() {
-      $('#qsLoadingOverlay').addClass('active');
-  }
+});
 
-  function hideQSLoading(delay = 5000) { // default 5 seconds
-      setTimeout(() => {
-          $('#qsLoadingOverlay').removeClass('active');
-      }, delay);
-  }
-  </script>
+// =========================
+// QS LOADER (REAL)
+// =========================
+function showQSLoading() {
+    $('#qsLoadingOverlay').addClass('active');
+}
+
+function hideQSLoading() {
+    $('#qsLoadingOverlay').removeClass('active');
+}
+
+
+// =========================
+// SUBMIT LOADER (USE SAME OVERLAY)
+// =========================
+function showSubmitLoading() {
+    $('#qsLoadingOverlay').addClass('active'); // 🔥 reuse QS overlay
+}
+
+function hideSubmitLoading() {
+    $('#qsLoadingOverlay').removeClass('active'); // 🔥 instant hide
+}
+</script>
   <script>
   $(document).ready(function(){
 
@@ -938,9 +981,16 @@
     let fileInput = document.getElementById("education_file");
 
     if (!degree || !school || !date || !fileInput.files.length) {
-        alert("Complete education fields");
-        return;
-    }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Complete education fields',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000
+    });
+    return;
+}
 
     let container = document.getElementById("educationHiddenInputs");
 
@@ -958,7 +1008,7 @@
 
     container.appendChild(clone);
 
-    alert("Education saved!");
+    // alert("Education saved!");
 
 });
 </script>

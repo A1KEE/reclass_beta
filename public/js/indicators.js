@@ -96,20 +96,39 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     const ncoiO = parseInt(document.getElementById("totalNCOI_O").value) || 0;
     const ncoiVS = parseInt(document.getElementById("totalNCOI_VS").value) || 0;
 
+    const finalEl = document.getElementById("finalRating");
+
+    /* =============================
+    NO POSITION
+    ============================= */
+    if(!position){
+        finalEl.textContent = "WAITING ⏳";
+        return;
+    }
+
+    /* =============================
+    TOTAL CHECKED
+    ============================= */
+    const totalChecked = coiO + coiVS + ncoiO + ncoiVS + totalS;
+
+    if(totalChecked === 0){
+        finalEl.textContent = "WAITING ⏳";
+        return;
+    }
+
     /* =============================
     DISQUALIFICATION RULE
     ============================= */
-
     if(["Teacher IV","Teacher V","Teacher VI","Teacher VII"].includes(position)){
         if(totalS >= 4){
-            document.getElementById("finalRating").textContent = "DISQUALIFIED ❌ (Too many S)";
+            finalEl.textContent = "DISQUALIFIED ❌ (Too many S)";
             return;
         }
     }
 
     if(["Master Teacher I","Master Teacher II","Master Teacher III"].includes(position)){
         if(totalVS >= 4){
-            document.getElementById("finalRating").textContent = "DISQUALIFIED ❌ (Too many VS)";
+            finalEl.textContent = "DISQUALIFIED ❌ (Too many VS)";
             return;
         }
     }
@@ -117,7 +136,6 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     /* =============================
     PR REQUIREMENTS
     ============================= */
-
     const prRequirements = {
 
         "Teacher II": { coiVS:6 , ncoiVS:4 },
@@ -135,26 +153,26 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     const req = prRequirements[position];
 
     if(!req){
-        document.getElementById("finalRating").textContent = "-";
+        finalEl.textContent = "WAITING ⏳";
         return;
     }
 
-    const qualified = (
+    /* =============================
+    CHECK IF PASSED
+    ============================= */
+    const meetsAllRequirements = (
         (!req.coiO || coiO >= req.coiO) &&
         (!req.coiVS || coiVS >= req.coiVS) &&
         (!req.ncoiO || ncoiO >= req.ncoiO) &&
         (!req.ncoiVS || ncoiVS >= req.ncoiVS)
     );
 
-    document.getElementById("finalRating").textContent =
-        qualified ? "QUALIFIED ✅" : "DISQUALIFIED ❌";
+    if(meetsAllRequirements){
+        finalEl.textContent = "QUALIFIED ✅";
+        return;
+    }
+    finalEl.textContent = "IN PROGRESS ⏳";
 }
-
-
-/* =======================================
-GLOBAL EVENT (DYNAMIC SAFE)
-======================================= */
-
 document.addEventListener("change", function(e){
 
     if(e.target.classList.contains("ppst-checkbox") || 

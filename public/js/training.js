@@ -98,7 +98,7 @@ function getTrainingPoints(increment) {
 // ==========================
 // UPDATE TRAINING STATUS (FIXED)
 // ==========================
-function updateTrainingStatus() {
+function updateTrainingStatus(updateTable = false) {
     let totalTeachingHours = 0;
     let trainingCount = 0;
 
@@ -113,26 +113,24 @@ function updateTrainingStatus() {
         }
     });
 
-    const remark = $('#training_remark');
+    let remarkHTML = '';
 
-    // ✅ WALANG QS
     if (!requiredTrainingHours || requiredTrainingHours <= 0) {
-        remark.html('<span class="text-muted">Waiting for the QS</span>');
+        remarkHTML = '<span class="text-muted">Waiting for the QS</span>';
     }
-
-    // ✅ WALANG TRAINING PA
     else if (trainingCount === 0) {
-        remark.html('<span class="text-muted">Waiting for the QS</span>');
+        remarkHTML = '<span class="text-muted">Waiting for the QS</span>';
     }
-
-    // ✅ MET
     else if (totalTeachingHours >= requiredTrainingHours) {
-        remark.html('<span class="text-success fw-bold">MET</span>');
+        remarkHTML = '<span class="text-success fw-bold">MET</span>';
+    }
+    else {
+        remarkHTML = '<span class="text-danger fw-bold">NOT MET</span>';
     }
 
-    // ✅ NOT MET (may training na pero kulang)
-    else {
-        remark.html('<span class="text-danger fw-bold">NOT MET</span>');
+    // ✅ IMPORTANT FIX
+    if (updateTable) {
+        $('#training_remark').html(remarkHTML);
     }
 
     // ======================
@@ -193,7 +191,7 @@ function loadTrainingQS() {
         requiredTrainingHours = parseFloat(positionConfig.training_hours) || 0;
         requiredTrainingLevel = getQualificationLevel(requiredTrainingHours);
 
-        updateTrainingStatus(); // 👈 IMPORTANT
+        updateTrainingStatus(false);
 
         return;
     }
@@ -286,7 +284,7 @@ function resetTraining() {
     $('input[name="comparative[training]"]').val(trainingPoints);
 
     // ===== Update remarks & modal =====
-    updateTrainingStatus();
+    updateTrainingStatus(false);
 
     // ===== Modal summary (teaching only) =====
     if (requiredTrainingHours && requiredTrainingHours > 0) {
@@ -582,7 +580,7 @@ $('#saveTraining').on('click', function () {
     // =========================
     // STATUS (IMPORTANT)
     // =========================
-    updateTrainingStatus();
+    updateTrainingStatus(true);
 
     // 👉 GET REMARK FROM UI
     let trainingRemark = $('#training_remark').text();
@@ -688,5 +686,5 @@ $(document).ready(function () {
         $('#training_remark').html('<span class="text-muted">Waiting for the QS</span>');
     }
 
-    updateTrainingStatus();
+    updateTrainingStatus(false);
 });

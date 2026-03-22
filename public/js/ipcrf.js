@@ -76,8 +76,13 @@ function renderIPCRFBoxes(){
 
     ipcrfContainer.innerHTML = '';
 
-    uploadedIPCRFs = Array(required).fill(null);
-    draftMetaIPCRFs = draftMetaIPCRFs.length ? draftMetaIPCRFs : Array(required).fill(null);
+    if(uploadedIPCRFs.length === 0){
+        uploadedIPCRFs = Array(required).fill(null);
+    }
+
+    if(draftMetaIPCRFs.length === 0){
+        draftMetaIPCRFs = Array(required).fill(null);
+    }
 
     for(let i=0;i<required;i++){
 
@@ -102,9 +107,8 @@ function renderIPCRFBoxes(){
 
                 <div class="ipcrf-actions mt-2 d-flex gap-2 justify-content-center">
 
-                    <button class="btn btn-sm btn-outline-primary d-none" id="view${i}">View</button>
-
-                    <button class="btn btn-sm btn-outline-danger d-none" id="remove${i}">Remove</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary d-none" id="view${i}">View</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger d-none" id="remove${i}">Remove</button>
 
                 </div>
 
@@ -188,6 +192,7 @@ function renderIPCRFBoxes(){
 
 
         viewBtn.onclick = e=>{
+            e.preventDefault();
             e.stopPropagation();
             const meta = draftMetaIPCRFs[i] || savedMetaIPCRFs[i];
             if(meta) window.open(meta.url,'_blank');
@@ -243,7 +248,21 @@ function renderIPCRFBoxes(){
 
 }
 
+function validateIPCRF(){
 
+    const count = draftMetaIPCRFs.filter((f, i) => f && !removedIndexes.includes(i)).length;
+
+    if(count === 0){
+        Swal.fire({
+            icon:'warning',
+            title:'Missing IPCRF',
+            text:'Please upload at least one IPCRF before submitting'
+        });
+        return false;
+    }
+
+    return true;
+}
 // =====================
 // SAVE BUTTON
 // =====================
@@ -252,19 +271,7 @@ if(saveBtn){
 
     saveBtn.addEventListener('click',()=>{
 
-        const count = draftMetaIPCRFs.filter(f=>f).length;
-
-        if(count === 0){
-
-            safeSwal({
-                icon:'warning',
-                title:'No file uploaded',
-                text:'Please upload at least one IPCRF file.'
-            });
-
-            return;
-
-        }
+       if(!validateIPCRF()) return;
 
         savedMetaIPCRFs = draftMetaIPCRFs.map((f,i)=> removedIndexes.includes(i)?null:f);
 
@@ -310,16 +317,10 @@ $('#applicantForm').on('submit', function(e){
 
     e.preventDefault();
 
-    const count = draftMetaIPCRFs.filter(f=>f).length;
-
-    if(count === 0){
-        Swal.fire({
-            icon:'warning',
-            title:'Missing IPCRF',
-            text:'Please upload at least one IPCRF before submitting'
-        });
-        return;
-    }
+    if(!validateIPCRF()){
+    hideSubmitLoading();
+    return;
+}
 
     let formData = new FormData(this);
 
@@ -327,7 +328,10 @@ $('#applicantForm').on('submit', function(e){
     uploadedIPCRFs.forEach((file, index) => {
         if(file){
             formData.append(`ipcrf_files[${index}][file]`, file);
-            formData.append(`ipcrf_files[${index}][title]`, `IPCRF ${new Date().getFullYear() - (2 - index)}`);
+            formData.append(
+                `ipcrf_files[${index}][title]`,
+                `IPCRF ${new Date().getFullYear() - (2 - index)}`
+            );
         }
     });
 
@@ -337,14 +341,23 @@ $('#applicantForm').on('submit', function(e){
         data: formData,
         processData: false,
         contentType: false,
+
         success: function(res){
+
+            hideSubmitLoading(); // ✅ REMOVE LOADER
+
             Swal.fire({
                 icon:'success',
                 title:'Saved successfully'
             }).then(()=> location.reload());
         },
+
         error: function(err){
+
+            hideSubmitLoading(); // ✅ REMOVE LOADER
+
             console.error(err);
+
             Swal.fire({
                 icon:'error',
                 title:'Upload failed'
@@ -377,9 +390,14 @@ window.resetIPCRF=function(){
 // MODAL OPEN
 // =====================
 
-if(ipcrfModalEl){
+let ipcrfInitialized = false;
 
-    ipcrfModalEl.addEventListener('show.bs.modal',renderIPCRFBoxes);
-
-}
+ipcrfModalEl.addEventListener('show.bs.modal', () => {
+    if(!ipcrfInitialized){
+        renderIPCRFBoxes();
+        ipcrfInitialized = true;
+    } else {
+        renderIPCRFBoxes(); // re-render UI only, no reset
+    }
+});
 });

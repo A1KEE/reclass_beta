@@ -378,6 +378,65 @@ table.table thead th {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
 }
+/* EVALUATING LOADER */
+#evalLoadingOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#evalLoadingOverlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+.qs-loader-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center; /* ✅ ADD THIS */
+}
+/* =========================
+   SUBMIT LOADER ONLY
+========================= */
+
+#submitLoadingOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    /* 🔥 IMPORTANT: hidden by default */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* 🔥 SHOW ONLY WHEN ACTIVE */
+#submitLoadingOverlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
 input[name="levels[]"] {
     cursor: not-allowed;
 }

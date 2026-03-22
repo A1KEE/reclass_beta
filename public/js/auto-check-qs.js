@@ -58,40 +58,11 @@ async function autoCheckQS() {
     // ----------------------------
     // CREATE BLUR OVERLAY + SPINNER
     // ----------------------------
-    const overlay = document.createElement('div');
-    overlay.id = 'qsLoadingOverlay';
-    overlay.style.position = 'fixed';
-    overlay.style.inset = '0';
-    overlay.style.background = 'rgba(255,255,255,0.65)';
-    overlay.style.backdropFilter = 'blur(6px)';
-    overlay.style.display = 'flex';
-    overlay.style.flexDirection = 'column';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = '9999';
-    overlay.style.width = '100vw';
-    overlay.style.height = '100vh';
-    overlay.style.opacity = '1';
-    overlay.style.visibility = 'visible';
-
-    overlay.innerHTML = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;">
-            <div class="loader" style="border:5px solid rgba(0,0,0,0.05);border-top:5px solid #1E3F66;border-radius:50%;width:55px;height:55px;animation:spin 0.8s linear infinite;"></div>
-            <p style="margin-top:18px;font-size:14px;color:#1E3F66;font-weight:500;text-align:center;opacity:0.85;animation:fadePulse 1.5s ease-in-out infinite;">
-                Evaluating Qualifications<br>Please wait while we check your records...
-            </p>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Add keyframes dynamically
-    const styleEl = document.createElement('style');
-    styleEl.innerHTML = `
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadePulse { 0% { opacity:0.4; } 50% { opacity:0.9; } 100% { opacity:0.4; } }
-    `;
-    document.head.appendChild(styleEl);
+   // ----------------------------
+// SHOW EVALUATING LOADER
+// ----------------------------
+const overlay = document.getElementById('evalLoadingOverlay');
+overlay.classList.add('active');
 
     // ----------------------------
     // Step-by-step animation
@@ -111,7 +82,7 @@ async function autoCheckQS() {
     const anyNotMet = remarks.some(r => r.toLowerCase().includes('not met'));
 
     // Remove overlay
-    overlay.remove();
+   overlay.classList.remove('active');
 
     function togglePerformance(show) {
         if (perfDiv) perfDiv.style.display = show ? 'block' : 'none';

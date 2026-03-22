@@ -1,13 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // HARD LOCK (global)
+    // HARD LOCK: isang beses lang lumabas
     if (window.ppstLegendShown) return;
     window.ppstLegendShown = true;
 
-    const ppstSection = document.getElementById('ppst-summary');
-    if (!ppstSection) return;
+    const ppstHeading = document.getElementById('ppst-summary');
+    if (!ppstHeading) return;
 
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
 
@@ -36,10 +36,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     timerProgressBar: true
                 });
 
-                observer.disconnect(); // KILL observer permanently
+                observer.unobserve(ppstHeading); // stop observing
             }
         });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.1 }); // maliit lang para mabilis lumabas
 
-    observer.observe(ppstSection);
+    observer.observe(ppstHeading);
 });
