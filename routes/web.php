@@ -40,11 +40,6 @@ Route::post('/notify-unqualified', [ApplicationController::class, 'notifyUnquali
 // Load PPST data
 Route::get('/load-ppst', [ApplicationController::class, 'loadPPST']);
 
-
-
-
-Route::post('/admin/applicants/{id}/status', [AdminController::class, 'updateStatus'])
-    ->name('admin.applicants.status');
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES (ADMIN SIDE)
@@ -66,6 +61,9 @@ Route::middleware(['auth'])->group(function () {
         // View applicant details
         Route::get('/applicants/{id}', [AdminController::class, 'show'])
             ->name('admin.applicants.show');
+
+        Route::post('/admin/applicants/{id}/status', [AdminController::class, 'updateStatus'])
+        ->name('admin.applicants.status');
     });
 
 });

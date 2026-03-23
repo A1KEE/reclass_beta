@@ -48,7 +48,7 @@
                 Required Years: <span id="required_exp_years_display">0</span><br>
                 Current Total: <span id="total_exp_years_display">0</span><br>
                 Status: <span class="text-muted">No experiences added</span><br>
-                QS Points: <span class="fw-bold">0</span>
+                Score: <span id="qsPoints" class="fw-bold text-muted">Waiting for input(0-10 points)</span>
               </div>
             </div>
 

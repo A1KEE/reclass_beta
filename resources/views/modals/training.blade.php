@@ -51,7 +51,7 @@
                   Required Hours: <span id="required_hours_display">0</span> hours<br>
                   Current Total: <span id="total_training_hours">0</span> hours<br>
                   Status: <span class="text-muted">No trainings added</span><br>
-                  Points: <span class="fw-bold">0</span>
+                  Score: <span class="fw-bold">Waiting for input(0-10 points)</span>
                 </div>
               </div>
 

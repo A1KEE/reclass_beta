@@ -391,7 +391,9 @@ function updateEducationSummaryLive() {
 
     $('#edu_degree_display').text(name);
     $('#edu_level_display').text(unitsLabel);
-    $('#edu_points_display').text(result.points);
+    $('#edu_points_display').text(
+    `${result.points} ${result.points === 1 ? 'point' : 'points'}`
+);
 
     let status = 'WAITING';
 
@@ -436,7 +438,10 @@ if (!name || !level) {
                 status === 'MET'
                     ? '<span class="text-success fw-bold">MET</span>'
                     : '<span class="text-danger fw-bold">NOT MET</span>'
-            }
+            }<br>
+            Score: <span class="fw-bold ${result.points > 0 ? 'text-primary' : 'text-muted'}">
+    ${result.points} ${result.points === 1 ? 'point' : 'points'}
+</span>
         </div>
     `);
 }

@@ -94,7 +94,13 @@ function getTrainingPoints(increment) {
     if (increment >= 2) return 2;
     return 0;
 }
+function formatPointsDisplay(points, hasInput) {
+    if (!hasInput) {
+        return `<span class="text-muted">Waiting for input (0–10 points)</span>`;
+    }
 
+    return `<span class="fw-bold text-primary">${points} points</span>`;
+}
 // ==========================
 // UPDATE TRAINING STATUS (FIXED)
 // ==========================
@@ -146,6 +152,12 @@ function updateTrainingStatus(updateTable = false) {
         }
     });
 
+    const applicantLevel = getQualificationLevel(totalTeachingHours);
+    const increments = Math.max(0, applicantLevel - requiredTrainingLevel);
+    const trainingPoints = getTrainingPoints(increments);
+    const hasInput = modalList.length > 0;
+    const pointsDisplay = formatPointsDisplay(trainingPoints, hasInput);
+
     if (requiredTrainingHours && requiredTrainingHours > 0) {
         let statusText = '<span class="text-muted">Waiting...</span>';
 
@@ -155,15 +167,16 @@ function updateTrainingStatus(updateTable = false) {
                 : '<span class="text-danger fw-bold">NOT MET</span>';
         }
 
-        $('#modal_training_summary').html(`
-            <div class="alert alert-info p-2">
-                <strong>Training Summary</strong><br>
-                Required Hours: ${requiredTrainingHours} hours<br>
-                Current Total (Teaching Only): ${totalTeachingHours} hours<br>
-                Status: ${statusText}
-                ${modalList.length > 0 ? '<hr>' + modalList.join('<br>') : '<br><small class="text-muted">No teaching-relevant training added</small>'}
-            </div>
-        `);
+           $('#modal_training_summary').html(`
+    <div class="alert alert-info p-2">
+        <strong>Training Summary</strong><br>
+        Required Hours: ${requiredTrainingHours} hours<br>
+        Current Total (Teaching Only): ${totalTeachingHours} hours<br>
+        Status: ${statusText}<br>
+        Score: ${pointsDisplay}
+        ${modalList.length > 0 ? '<hr>' + modalList.join('<br>') : '<br><small class="text-muted">No teaching-relevant training added</small>'}
+    </div>
+`);
     }
 }
 
@@ -281,6 +294,8 @@ function resetTraining() {
     const applicantLevel = getQualificationLevel(totalTeachingHours);
     const increments = Math.max(0, applicantLevel - requiredTrainingLevel);
     const trainingPoints = getTrainingPoints(increments);
+    const hasInput = modalList.length > 0;
+    const pointsDisplay = formatPointsDisplay(trainingPoints, hasInput);
     $('input[name="comparative[training]"]').val(trainingPoints);
 
     // ===== Update remarks & modal =====
@@ -293,9 +308,8 @@ function resetTraining() {
                 <strong>Training Summary</strong><br>
                 Required Hours: ${requiredTrainingHours} hours<br>
                 Current Total (Teaching Only): ${totalTeachingHours} hours<br>
-                Status: <span class="text-${totalTeachingHours >= requiredTrainingHours ? 'success' : 'danger'} fw-bold">
-                    ${totalTeachingHours >= requiredTrainingHours ? 'MET' : 'NOT MET'}
-                </span>
+                Status: <span class="text-${totalTeachingHours >= requiredTrainingHours ? 'success' : 'danger'} fw-bold">${totalTeachingHours >= requiredTrainingHours ? 'MET' : 'NOT MET'}</span><br>
+                Score: ${pointsDisplay}<br>
                 ${modalList.length > 0 ? '<hr>' + modalList.join('<br>') : '<br><small class="text-muted">No teaching-relevant training added</small>'}
             </div>
         `);

@@ -327,10 +327,6 @@ function computeExperienceTotal() {
         isValid: allItemsValid
     };
 }
-
-// ==========================
-// UPDATE EXPERIENCE MODAL SUMMARY
-// ==========================
 // ==========================
 // UPDATE EXPERIENCE MODAL SUMMARY WITH LIVE DATE VALIDATION
 // ==========================
@@ -338,9 +334,21 @@ function updateExperienceModalSummary() {
     const modalSummary = $('#experience_summary_modal');
     const items = $('.experience-item');
 
+    // ==========================
+    // DEFAULT (NO EXPERIENCE)
+    // ==========================
     if (items.length === 0) {
-        modalSummary.html('<div class="alert alert-warning p-2">No experience(s) added</div>');
-        $('input[name="comparative[experience]"]').val(0); // Reset points
+        modalSummary.html(`
+            <div class="alert bg-light-green border-light-green mb-0 p-3">
+                <strong>Experience Summary</strong><br>
+                Required Years: ${requiredYears} year/s <br>
+                Current Total: 0 <br>
+                Status: <span class="text-muted">No experiences added</span><br>
+                Score: <span class="fw-bold text-muted">Waiting for input (0–10 points)</span>
+            </div>
+        `);
+
+        $('input[name="comparative[experience]"]').val(0);
         $('#experience_remark').html('<span class="text-muted">Waiting for The QS</span>');
         return;
     }
@@ -348,75 +356,91 @@ function updateExperienceModalSummary() {
     let allFilled = true;
     let dateError = false;
 
-    // Loop through experience items
     items.each(function() {
-        const startVal = $(this).find('.exp_start').val();
-        const endVal = $(this).find('.exp_end').val();
+        const start = $(this).find('.exp_start').val();
+        const end = $(this).find('.exp_end').val();
         const pos = $(this).find('.exp_position').val();
 
-        // Check required fields
-        if (!startVal || !endVal || !pos) {
+        if (!start || !end || !pos) {
             allFilled = false;
         }
 
-        // Check live date validation
-        if (startVal && endVal && new Date(endVal) < new Date(startVal)) {
+        if (start && end && new Date(end) < new Date(start)) {
             dateError = true;
         }
     });
 
-    // If fields are incomplete or dates invalid
+    // ==========================
+    // INCOMPLETE
+    // ==========================
     if (!allFilled) {
         modalSummary.html(`
             <div class="alert alert-info p-2">
                 <strong>Experience Summary</strong><br>
-                Status: <span class="text-muted">Waiting... (Incomplete Fields)</span>
+                Required Years: ${requiredYears} year/s <br>
+                Current Total: 0 <br>
+                Status: <span class="text-muted">Waiting... (Incomplete Fields)</span><br>
+                Score: <span class="fw-bold text-muted">Waiting for input (0–10 points)</span>
             </div>
         `);
+
         $('input[name="comparative[experience]"]').val(0);
-        $('#experience_remark').html('<span class="text-muted">Waiting for The QS</span>');
         return;
     }
 
+    // ==========================
+    // INVALID DATE
+    // ==========================
     if (dateError) {
         modalSummary.html(`
             <div class="alert alert-danger p-2">
                 <strong>Experience Summary</strong><br>
-                Status: <span class="text-danger fw-bold">Invalid Dates Detected</span><br>
-                Please correct end dates that are earlier than start dates.
+                Status: <span class="text-danger fw-bold">Invalid Dates</span>
             </div>
         `);
+
         $('input[name="comparative[experience]"]').val(0);
-        $('#experience_remark').html('<span class="text-muted">Waiting for The QS</span>');
         return;
     }
 
-    // If all good, compute total
+    // ==========================
+    // COMPUTE
+    // ==========================
     const result = computeExperienceTotal();
 
-    const status = result.totalYears >= requiredYears ?
-        '<span class="text-success fw-bold">MET</span>' :
-        '<span class="text-danger fw-bold">NOT MET</span>';
+    const status = result.totalYears >= requiredYears
+        ? '<span class="text-success fw-bold">MET</span>'
+        : '<span class="text-danger fw-bold">NOT MET</span>';
 
-    // Display summary
+    const hasInput = items.length > 0;
+
+    let pointsDisplay = hasInput
+        ? `<span class="fw-bold text-primary">${result.qsPoints} points</span>`
+        : `<span class="fw-bold text-muted">Waiting for input (0–10 points)</span>`;
+
+    // ==========================
+    // FINAL UI (MATCH TRAINING)
+    // ==========================
     modalSummary.html(`
-        <div class="alert alert-info p-2">
+        <div class="alert bg-light-green border-light-green mb-0 p-3">
             <strong>Experience Summary</strong><br>
-            Total Years: ${formatYearsMonths(result.totalYears)}<br>
-            Status: ${status}<br>
+            Required Years: ${requiredYears} <br>
+            Current Total: ${formatYearsMonths(result.totalYears)} <br>
+            Status: ${status} <br>
+            Score: ${pointsDisplay}
         </div>
     `);
 
-    // Update comparative points and remark
+    // ==========================
+    // SAVE VALUES
+    // ==========================
     $('input[name="comparative[experience]"]').val(result.qsPoints);
-    // SAVE to hidden inputs (ito yung papunta sa DB)
     $('#experience_points').val(result.qsPoints);
 
-    if (result.totalYears >= requiredYears) {
-        $('#remarksExperience').val('MET');
-    } else {
-        $('#remarksExperience').val('NOT MET');
-    }
+    $('#remarksExperience').val(
+        result.totalYears >= requiredYears ? 'MET' : 'NOT MET'
+    );
+
     $('#experience_remark').html(status);
 }
 

@@ -54,7 +54,8 @@
               <strong>Education Summary</strong><br>
               Degree: <span id="edu_degree_display">—</span><br>
               Education Level: <span id="edu_level_display">—</span><br>
-              Status: <span id="edu_status_display" class="text-muted">Waiting</span>
+              Status: <span id="edu_status_display" class="text-muted">Waiting..</span><br>
+              Score: <span id="edu_points_display" class="fw-bold text-muted">Waiting for input(0-10 points)</span>
             </div>
           </div>
 
