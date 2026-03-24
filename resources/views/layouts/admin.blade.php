@@ -99,6 +99,36 @@
         body.dark-mode a {
             color: #ccc;
         }
+        /* applicant datatable */
+        #applicantsTable {
+        font-size: 13px;
+        }
+
+        #applicantsTable th,
+        #applicantsTable td {
+            padding: 6px 8px !important;
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            height: 30px;
+            font-size: 13px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            height: 30px;
+            font-size: 13px;
+        }
+
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            font-size: 12px;
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 6px;
+        }
         /* MOBILE */
         @media(max-width: 768px){
             .sidebar {
@@ -185,14 +215,19 @@
     const body = document.body;
     const sidebar = document.getElementById('sidebar');
 
-    toggleBtn.addEventListener('click', function () {
+   toggleBtn.addEventListener('click', function () {
 
-        // Desktop collapse
-        body.classList.toggle('sidebar-collapsed');
+    body.classList.toggle('sidebar-collapsed');
+    sidebar.classList.toggle('show');
 
-        // Mobile show
-        sidebar.classList.toggle('show');
-    });
+    // 🔥 FIX ALIGNMENT (ITO LANG IMPORTANTE)
+    setTimeout(() => {
+        if (table) {
+            table.columns.adjust();
+        }
+    }, 300);
+
+});
 </script>
 <script>
     // AUTO APPLY THEME ON LOAD

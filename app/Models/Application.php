@@ -49,12 +49,16 @@ class Application extends Model
         return $this->hasMany(Eligibility::class);
     }
 
-    public function ipcrf()
+    public function ipcrfs()
     {
-        return $this->hasMany(Ipcrf::class);
+        return $this->hasMany(IpcrfFile::class);
     }
     public function ppstRatings()
     {
         return $this->hasMany(ApplicationPpstRating::class);
+    }
+    public function scores()
+    {
+        return $this->hasOne(\App\Models\ApplicationScore::class, 'application_id');
     }
 }
