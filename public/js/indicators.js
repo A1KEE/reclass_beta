@@ -158,8 +158,42 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     // =============================
     // COI CHECK
     // =============================
-    if(req.coiO && coiO < req.coiO) meetsAllRequirements = false;
-    if(req.coiVS && coiVS < req.coiVS) meetsAllRequirements = false;
+   if(position === "Teacher V"){
+
+    const totalCOI = coiO + coiVS;
+    const totalNCOI = ncoiO + ncoiVS;
+
+    // =============================
+    // HARD REQUIREMENTS (AUTO DQ)
+    // =============================
+    if(coiO < 6){
+        finalEl.textContent = "DISQUALIFIED ❌ - Need at least 6 COI Outstanding";
+        if(resultInput) resultInput.value = "disqualified";
+        return;
+    }
+
+    if(ncoiO < 4){
+        finalEl.textContent = "DISQUALIFIED ❌ - Need at least 4 NCOI Outstanding";
+        if(resultInput) resultInput.value = "disqualified";
+        return;
+    }
+
+    // =============================
+    // BASELINE TOTAL (Teacher IV)
+    // =============================
+    if(totalCOI < 21 || totalNCOI < 16){
+        finalEl.textContent = "IN PROGRESS ⏳";
+        if(resultInput) resultInput.value = "draft";
+        return;
+    }
+
+    // =============================
+    // PASOK NA
+    // =============================
+    finalEl.textContent = "QUALIFIED ✅";
+    if(resultInput) resultInput.value = "qualified";
+    return;
+}
 
     // =============================
     // NCOI LOGIC
@@ -172,8 +206,10 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     // =============================
     // WARNING
     // =============================
-    if(isHighPosition && ncoiO < ncoiVS){
-        warningEl.textContent = "⚠ NCOIs Very Satisfactor is higher than Outstanding";
+    let maxAllowedVS = requiredNCOI - ncoiO;
+
+    if(isHighPosition && ncoiVS > maxAllowedVS){
+        warningEl.textContent = "⚠ Too many Very Satisfactory(VS) compared to Outstanding(O)";
     }else{
         warningEl.textContent = "";
     }
@@ -201,18 +237,10 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     // =============================
     // FINAL DISQUALIFICATION
     // =============================
-    if(isHighPosition && ncoiO < ncoiVS){
+    if(isHighPosition && ncoiVS > maxAllowedVS){
         finalEl.textContent = "DISQUALIFIED ❌ - NCOIs Very Satisfactor higher than Outstanding";
         if(resultInput) resultInput.value = "disqualified";
         return;
-    }
-
-    // =============================
-    // NORMAL CHECK
-    // =============================
-    if(!isHighPosition){
-        if(req.ncoiO && ncoiO < req.ncoiO) meetsAllRequirements = false;
-        if(req.ncoiVS && ncoiVS < req.ncoiVS) meetsAllRequirements = false;
     }
 
     // =============================
