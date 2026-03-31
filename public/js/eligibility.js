@@ -198,6 +198,7 @@ function saveEligibility() {
         <span class="text-success fw-bold">MET</span>
     `);
 
+    document.getElementById("eligibility_remarks").value = "MET";
     eligibilitySaved = true;
 
     Swal.fire({
@@ -229,6 +230,7 @@ function resetEligibility() {
     $('#eligibility_summary').html('<span class="text-muted">No eligibility added</span>');
     $('#eligibility_remark').html('<span class="text-muted">Waiting for the QS</span>');
 
+    document.getElementById("eligibility_remarks").value = "NOT MET";
     eligibilitySaved = false;
 }
 

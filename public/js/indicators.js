@@ -68,10 +68,17 @@ function updateTotals(){
         }
     });
 
+    // ✅ DISPLAY TOTALS
     document.getElementById("totalCOI_O").value = coiO;
     document.getElementById("totalCOI_VS").value = coiVS;
     document.getElementById("totalNCOI_O").value = ncoiO;
     document.getElementById("totalNCOI_VS").value = ncoiVS;
+
+    // ✅ SAVE TO HIDDEN INPUTS (FOR DATABASE)
+    document.getElementById("coi_outstanding").value = coiO;
+    document.getElementById("coi_vs").value = coiVS;
+    document.getElementById("ncoi_outstanding").value = ncoiO;
+    document.getElementById("ncoi_vs").value = ncoiVS;
 
     calculateFinalRating(totalS, totalVS);
 }
@@ -87,19 +94,16 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     const finalEl = document.getElementById("finalRating");
     const warningEl = document.getElementById("ncoiWarning");
     const progressEl = document.getElementById("ppstProgress");
-    const resultInput = document.getElementById("ppst_result"); // ✅ hidden input
+    const resultInput = document.getElementById("ppst_result");
 
     const coiO = +document.getElementById("totalCOI_O").value || 0;
     const coiVS = +document.getElementById("totalCOI_VS").value || 0;
     const ncoiO = +document.getElementById("totalNCOI_O").value || 0;
     const ncoiVS = +document.getElementById("totalNCOI_VS").value || 0;
 
-    // =============================
-    // INITIAL STATES
-    // =============================
     if(!position){
         finalEl.textContent = "WAITING ⏳";
-        if(resultInput) resultInput.value = "draft";
+        resultInput.value = "draft";
         return;
     }
 
@@ -107,7 +111,7 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
 
     if(totalChecked === 0){
         finalEl.textContent = "WAITING ⏳";
-        if(resultInput) resultInput.value = "draft";
+        resultInput.value = "draft";
         return;
     }
 
@@ -116,16 +120,16 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     // =============================
     if(["Teacher IV","Teacher V","Teacher VI","Teacher VII"].includes(position)){
         if(totalS >= 3){
-            finalEl.textContent = "DISQUALIFIED ❌ - 3 Satisfactor(S) reached";
-            if(resultInput) resultInput.value = "disqualified";
+            finalEl.textContent = "DISQUALIFIED ❌ - 3 S reached";
+            resultInput.value = "disqualified";
             return;
         }
     }
 
     if(["Master Teacher I","Master Teacher II","Master Teacher III"].includes(position)){
         if(totalVS >= 3){
-            finalEl.textContent = "DISQUALIFIED ❌ - 3 Very Satisfactor(VS) reached";
-            if(resultInput) resultInput.value = "disqualified";
+            finalEl.textContent = "DISQUALIFIED ❌ - 3 VS reached";
+            resultInput.value = "disqualified";
             return;
         }
     }
@@ -146,54 +150,42 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
     };
 
     const req = prRequirements[position];
-
     if(!req){
-        finalEl.textContent = "WAITING... ⏳";
-        if(resultInput) resultInput.value = "draft";
-        return;
-    }
-
-    let meetsAllRequirements = true;
-
-    // =============================
-    // COI CHECK
-    // =============================
-   if(position === "Teacher V"){
-
-    const totalCOI = coiO + coiVS;
-    const totalNCOI = ncoiO + ncoiVS;
-
-    // =============================
-    // HARD REQUIREMENTS (AUTO DQ)
-    // =============================
-    if(coiO < 6){
-        finalEl.textContent = "DISQUALIFIED ❌ - Need at least 6 COI Outstanding";
-        if(resultInput) resultInput.value = "disqualified";
-        return;
-    }
-
-    if(ncoiO < 4){
-        finalEl.textContent = "DISQUALIFIED ❌ - Need at least 4 NCOI Outstanding";
-        if(resultInput) resultInput.value = "disqualified";
+        finalEl.textContent = "WAITING ⏳";
+        resultInput.value = "draft";
         return;
     }
 
     // =============================
-    // BASELINE TOTAL (Teacher IV)
+    // TEACHER V SPECIAL LOGIC
     // =============================
-    if(totalCOI < 21 || totalNCOI < 16){
-        finalEl.textContent = "IN PROGRESS ⏳";
-        if(resultInput) resultInput.value = "draft";
+    if(position === "Teacher V"){
+
+        const totalCOI = coiO + coiVS;
+        const totalNCOI = ncoiO + ncoiVS;
+
+        if(coiO < 6){
+            finalEl.textContent = "DISQUALIFIED ❌ - Need 6 COI O";
+            resultInput.value = "disqualified";
+            return;
+        }
+
+        if(ncoiO < 4){
+            finalEl.textContent = "DISQUALIFIED ❌ - Need 4 NCOI O";
+            resultInput.value = "disqualified";
+            return;
+        }
+
+        if(totalCOI < 21 || totalNCOI < 16){
+            finalEl.textContent = "IN PROGRESS ⏳";
+            resultInput.value = "draft";
+            return;
+        }
+
+        finalEl.textContent = "QUALIFIED ✅";
+        resultInput.value = "qualified";
         return;
     }
-
-    // =============================
-    // PASOK NA
-    // =============================
-    finalEl.textContent = "QUALIFIED ✅";
-    if(resultInput) resultInput.value = "qualified";
-    return;
-}
 
     // =============================
     // NCOI LOGIC
@@ -203,57 +195,41 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
 
     const isHighPosition = ["Teacher VI","Teacher VII","Master Teacher I","Master Teacher II","Master Teacher III"].includes(position);
 
-    // =============================
-    // WARNING
-    // =============================
     let maxAllowedVS = requiredNCOI - ncoiO;
 
     if(isHighPosition && ncoiVS > maxAllowedVS){
-        warningEl.textContent = "⚠ Too many Very Satisfactory(VS) compared to Outstanding(O)";
+        warningEl.textContent = "⚠ Too many VS compared to O";
     }else{
         warningEl.textContent = "";
     }
 
-    // =============================
-    // PROGRESS
-    // =============================
     let remaining = Math.max(requiredNCOI - actualNCOI, 0);
 
     progressEl.textContent = remaining > 0 
-        ? `Remaining NCOI needed: ${remaining}` 
-        : `NCOI requirement complete ✔`;
+        ? `Remaining NCOI: ${remaining}` 
+        : `NCOI complete ✔`;
 
-    // =============================
-    // CHECK IF COMPLETE
-    // =============================
-    const isComplete = actualNCOI >= requiredNCOI;
-
-    if(!isComplete){
+    if(actualNCOI < requiredNCOI){
         finalEl.textContent = "IN PROGRESS ⏳";
-        if(resultInput) resultInput.value = "draft";
+        resultInput.value = "draft";
         return;
     }
 
-    // =============================
-    // FINAL DISQUALIFICATION
-    // =============================
     if(isHighPosition && ncoiVS > maxAllowedVS){
-        finalEl.textContent = "DISQUALIFIED ❌ - NCOIs Very Satisfactor higher than Outstanding";
-        if(resultInput) resultInput.value = "disqualified";
+        finalEl.textContent = "DISQUALIFIED ❌ - VS > O";
+        resultInput.value = "disqualified";
         return;
     }
 
-    // =============================
-    // FINAL RESULT
-    // =============================
-    if(meetsAllRequirements){
-        finalEl.textContent = "QUALIFIED ✅";
-        if(resultInput) resultInput.value = "qualified";
-    }else{
-        finalEl.textContent = "IN PROGRESS ⏳";
-        if(resultInput) resultInput.value = "draft";
-    }
+    finalEl.textContent = "QUALIFIED ✅";
+    resultInput.value = "qualified";
 }
+
+
+/* =======================================
+EVENTS
+======================================= */
+
 document.addEventListener("change", function(e){
     if(e.target.classList.contains("ppst-checkbox") || 
        e.target.classList.contains("ppst-checkbox-s")){
@@ -262,12 +238,16 @@ document.addEventListener("change", function(e){
         updateTotals();
     }
 });
+
 function initPPST(){
     updateTotals();
 }
+
+
 /* =======================================
 POSITION CHANGE
 ======================================= */
+
 document.getElementById("position_applied")?.addEventListener("change", function(){
 
     const position = this.value;
@@ -282,9 +262,11 @@ document.getElementById("position_applied")?.addEventListener("change", function
 
 });
 
+
 /* =======================================
 ON LOAD
 ======================================= */
+
 document.addEventListener("DOMContentLoaded", function(){
     initPPST();
 });

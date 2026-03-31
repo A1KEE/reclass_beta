@@ -13,12 +13,7 @@
 <p>Thank you for submitting your application.</p>
 
 <p>
-    <strong>Status:</strong> 
-    @if($application->status === 'QUALIFIED')
-        <span style="color:green;">QUALIFIED ✅</span>
-    @else
-        <span style="color:red;">NOT QUALIFIED ❌</span>
-    @endif
+    <strong>Status:</strong> {!! $finalResultText !!}
 </p>
 
 <p>

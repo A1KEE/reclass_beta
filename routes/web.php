@@ -69,7 +69,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('admin.settings')
         ->middleware('auth');
 
-        Route::put('/admin/applications/{id}', [AdminController::class, 'updateApplication'])->name('admin.applications.update');
+        Route::put('/admin/scores/{id}', [AdminController::class, 'update'])
+    ->name('admin.scores.update');
     });
 
 });

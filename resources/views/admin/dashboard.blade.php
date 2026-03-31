@@ -6,10 +6,10 @@
     <h5 class="mb-4 fw-bold">📊 Admin Dashboard</h5>
 
     <!-- STATS CARDS -->
-    <div class="row">
+    <div class="row stats-row">
 
         <!-- TOTAL -->
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card stat-card total-card">
                 <div class="card-body d-flex justify-content-between align-items-center">
 
@@ -28,7 +28,7 @@
         </div>
 
         <!-- PENDING -->
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card stat-card pending-card">
                 <div class="card-body d-flex justify-content-between align-items-center">
 
@@ -49,7 +49,7 @@
         </div>
 
         <!-- DRAFT -->
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card stat-card draft-card">
                 <div class="card-body d-flex justify-content-between align-items-center">
 
@@ -68,6 +68,26 @@
                 </div>
             </div>
         </div>
+        <!-- EVALUATED -->
+<div class="col-md-3 mb-3">
+    <div class="card stat-card evaluated-card">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <div>
+                <h6>Evaluated</h6>
+                <h2 class="counter text-primary" data-target="{{ $evaluated }}">0</h2>
+                <span class="badge badge-primary">
+                    {{ $total > 0 ? round(($evaluated / $total) * 100) : 0 }}%
+                </span>
+            </div>
+
+            <div class="icon-box">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+
+        </div>
+    </div>
+</div>
 
     </div>
 
@@ -144,10 +164,10 @@ counters.forEach(counter => {
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Total', 'Pending', 'Draft'],
+                labels: ['Total', 'Pending', 'Draft', 'Evaluated'],
                 datasets: [{
                     label: 'Applications',
-                    data: [{{ $total }}, {{ $pending }}, {{ $draft }}],
+                    data: [{{ $total }}, {{ $pending }}, {{ $draft }}, {{ $evaluated }}],
                     borderWidth: 1
                 }]
             },

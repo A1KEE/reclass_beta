@@ -15,208 +15,256 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 
     <style>
-        body {
-            background: #f4f6f9;
-            overflow-x: hidden;
-        }
+    body {
+        background: #f4f6f9;
+        overflow-x: hidden;
+    }
 
-        /* SIDEBAR */
+    /* =========================
+       SIDEBAR
+    ========================= */
+    .sidebar {
+        height: 100vh;
+        width: 240px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: #1e1e2d;
+        color: #fff;
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar a {
+        color: #cfcfcf;
+        display: block;
+        padding: 12px 20px;
+        text-decoration: none;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+        background: #343a40;
+        color: #fff;
+    }
+
+    .sidebar .brand {
+        font-size: 18px;
+        font-weight: bold;
+        padding: 15px 20px;
+        background: #111;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sidebar .brand img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .sidebar-menu {
+        flex: 1;
+    }
+
+    .sidebar-footer {
+        padding: 15px;
+    }
+
+    .user-card {
+        background: #111;
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    /* =========================
+       COLLAPSED SIDEBAR
+    ========================= */
+    .sidebar-collapsed .sidebar {
+        width: 70px;
+    }
+
+    .sidebar-collapsed .content {
+        margin-left: 70px;
+    }
+
+    .sidebar-collapsed .sidebar a span,
+    .sidebar-collapsed .brand span {
+        display: none;
+    }
+
+    .sidebar-collapsed .brand {
+        justify-content: center;
+    }
+
+    /* =========================
+       CONTENT
+    ========================= */
+    .content {
+        margin-left: 240px;
+        padding: 20px;
+        transition: all 0.3s;
+    }
+
+    .topbar {
+        background: #fff;
+        padding: 10px 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* =========================
+       DARK MODE
+    ========================= */
+    body.dark-mode {
+        background: #121212;
+        color: #eee;
+    }
+
+    body.dark-mode .topbar {
+        background: #1f1f1f;
+        border-color: #333;
+    }
+
+    body.dark-mode .sidebar {
+        background: #111;
+    }
+
+    body.dark-mode .card {
+        background: #1e1e1e;
+        color: #fff;
+    }
+
+    /* =========================
+       STAT CARDS (MODERN UI)
+    ========================= */
+
+    .stat-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        transition: 0.25s ease-in-out;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+
+    /* FULL WIDTH ROW FIX (4 cards same row) */
+    .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px; /* mas dikit */
+}
+
+.stats-row .col-md-3 {
+    flex: 1;
+    min-width: 220px; /* para hindi sobrang sikip sa small screens */
+}
+
+    /* LEFT BORDER COLORS */
+    .total-card {
+        border-left: 5px solid #343a40;
+    }
+
+    .pending-card {
+        border-left: 5px solid #ffc107;
+    }
+
+    .draft-card {
+        border-left: 5px solid #0dcaf0;
+    }
+
+    .evaluated-card {
+        border-left: 5px solid #198754;
+    }
+
+    /* ICON */
+    .icon-box i {
+        font-size: 30px;
+        opacity: 0.85;
+    }
+
+    .pending-card .icon-box i {
+        color: #ffc107;
+    }
+
+    .draft-card .icon-box i {
+        color: #0dcaf0;
+    }
+
+    .evaluated-card .icon-box i {
+        color: #198754;
+    }
+
+    /* =========================
+       BADGES (STATUS COLORS)
+    ========================= */
+
+    .badge {
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 12px;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .badge-info {
+        background-color: #0dcaf0;
+        color: #fff;
+    }
+
+    .badge-success {
+        background-color: #198754;
+        color: #fff;
+    }
+
+    .badge-primary {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+
+    /* =========================
+       USER / ADMIN UI FIX
+    ========================= */
+
+    .user-info strong {
+        font-size: 12px;
+    }
+
+    .user-info small {
+        font-size: 11px;
+        color: #aaa;
+    }
+
+    /* =========================
+       MOBILE FIX
+    ========================= */
+    @media(max-width: 768px) {
         .sidebar {
-            height: 100vh;
-            width: 240px;
-            position: fixed;
-            top: 0;
+            left: -240px;
+        }
+
+        .sidebar.show {
             left: 0;
-            background: #1e1e2d;
-            color: #fff;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
         }
 
-        .sidebar a {
-            color: #cfcfcf;
-            display: block;
-            padding: 12px 20px;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background: #343a40;
-            color: #fff;
-        }
-
-        /* BRAND */
-        .sidebar .brand {
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px 20px;
-            background: #111;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sidebar .brand img {
-            width: 28px;
-            height: 28px;
-        }
-
-        /* MENU */
-        .sidebar-menu {
-            flex: 1;
-        }
-
-        /* FOOTER */
-        .sidebar-footer {
-            padding: 15px;
-        }
-
-        .user-card {
-            background: #111;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        /* =========================
-           COLLAPSE MODE
-        ========================= */
-
-        .sidebar-collapsed .sidebar {
-            width: 70px;
-        }
-
-        .sidebar-collapsed .content {
-            margin-left: 70px;
-        }
-
-        /* 🔥 HIDE ALL SIDEBAR TEXT ON COLLAPSE */
-        .sidebar-collapsed .sidebar a span {
-            display: none;
-        }
-
-        /* 🔥 RFTP HIDE ON COLLAPSE */
-        .sidebar-collapsed .brand span {
-            display: none;
-        }
-
-        .sidebar-collapsed .brand {
-            justify-content: center;
-        }
-
-        /* 🔥 ADMIN NAME SMALLER (REQUESTED) */
-        .user-info strong {
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .user-info small {
-            font-size: 11px;
-            color: #aaa;
-        }
-
-        /* 🔥 KEEP ADMIN INFO SMALL BUT VISIBLE WHEN COLLAPSED */
-        .sidebar-collapsed .user-info strong {
-            font-size: 10px;
-        }
-
-        .sidebar-collapsed .user-info small {
-            font-size: 9px;
-        }
-
-        /* KEEP FOOTER LAYOUT CLEAN */
-        .sidebar-footer .btn {
-            font-size: 12px;
-            padding: 6px 10px;
-        }
-
-        .sidebar-collapsed .sidebar-footer .btn {
-            font-size: 11px;
-            padding: 6px 8px;
-            width: 100%;
-        }
-
-        /* CONTENT */
         .content {
-            margin-left: 240px;
-            padding: 20px;
-            transition: all 0.3s;
+            margin-left: 0;
         }
 
-        /* TOPBAR */
-        .topbar {
-            background: #fff;
-            padding: 10px 20px;
-            border-bottom: 1px solid #ddd;
+        /* fallback for cards */
+        .stats-row {
+            flex-wrap: wrap;
         }
-
-        /* DARK MODE SAFE */
-        body.dark-mode {
-            background: #121212;
-            color: #eee;
-        }
-
-        body.dark-mode .topbar {
-            background: #1f1f1f;
-            border-color: #333;
-        }
-
-        body.dark-mode .sidebar {
-            background: #111;
-        }
-
-        body.dark-mode .card {
-            background: #1e1e1e;
-            color: #fff;
-        }
-
-        body.dark-mode a {
-            color: #ccc;
-        }
-/* smooth transition */
-.sidebar-user,
-.logout-btn,
-.admin-name,
-.admin-role,
-.logout-text {
-    transition: all 0.3s ease;
-}
-
-/* COLLAPSED STATE */
-.sidebar-collapsed .admin-name,
-.sidebar-collapsed .admin-role,
-.sidebar-collapsed .logout-text {
-    display: none;
-}
-
-/* center icons when collapsed */
-.sidebar-collapsed .sidebar-user {
-    text-align: center;
-}
-
-/* logout icon only when collapsed */
-.sidebar-collapsed .logout-btn {
-    justify-content: center;
-}
-
-/* optional spacing fix */
-.sidebar-collapsed .user-icon {
-    font-size: 22px;
-}
-        @media(max-width: 768px){
-            .sidebar {
-                left: -240px;
-            }
-            .sidebar.show {
-                left: 0;
-            }
-            .content {
-                margin-left: 0;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 
 <body>

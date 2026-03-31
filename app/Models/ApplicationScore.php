@@ -16,6 +16,11 @@ class ApplicationScore extends Model
         'training_remarks',
         'experience_points',
         'experience_remarks',
-        'performance_points'
+        'performance_points',
+        'coi_score',
+        'ncoi_score',
+        'bei_score',
+
+        'total_score'
     ];
 }

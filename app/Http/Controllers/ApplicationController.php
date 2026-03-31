@@ -263,7 +263,15 @@ if ($request->has('ppst')) {
             'training_remarks'   => $request->training_remarks,
             'experience_points'  => $request->experience_points,
             'experience_remarks' => $request->experience_remarks,
+            'eligibility_remarks' => $request->eligibility_remarks,
             'performance_points' => $request->performance_points,
+
+            'coi_outstanding' => $request->coi_outstanding,
+            'coi_very_satisfactory' => $request->coi_very_satisfactory,
+            'ncoi_outstanding' => $request->ncoi_outstanding,
+            'ncoi_very_satisfactory' => $request->ncoi_very_satisfactory,
+            'final_result' => $request->ppst_result,
+
             'updated_at' => now(),
             'created_at' => now(),
         ]
@@ -271,8 +279,8 @@ if ($request->has('ppst')) {
 
     try {
 
-        Mail::to($application->email)
-            ->send(new ApplicationStatusMail($application));
+       Mail::to($application->email)
+    ->send(new ApplicationStatusMail($application, $request->ppst_result));
 
     } catch (\Exception $e) {
 

@@ -26,7 +26,7 @@ $(function(){
     // =====================
     // APPLY BUTTON
     // =====================
-    $(document).on("click", "#applyPerfBtn", function(e){
+  $(document).on("click", "#applyPerfBtn", function(e){
     e.preventDefault();
 
     let result = $("#perfResultModal").val();
@@ -36,16 +36,10 @@ $(function(){
         return;
     }
 
-    // display
-    $("#performanceFinal").val(result);
+    // I-set ang value at i-trigger ang calculation
+    $("#performanceFinal").val(result).trigger('input');
 
-    // SAVE to DB
-    $("#performance_points").val(result);
-
-    // close modal
-    let modal = bootstrap.Modal.getInstance(document.getElementById('performanceModal'));
-    if(modal){
-        modal.hide();
-    }
+    // --- ITO ANG IPALIT MO SA PAG-CLOSE NG MODAL ---
+    $('#performanceModal').modal('hide'); 
 });
 });

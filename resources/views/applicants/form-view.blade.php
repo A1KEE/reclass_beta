@@ -46,16 +46,7 @@
         @if(session('success'))
           <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
-        <form id="applicantForm" 
-      action="{{ isset($application) && $application->id ? route('admin.applications.update', $application->id) : route('applicants.store') }}" 
-      method="POST" 
-      enctype="multipart/form-data">
-    
-    @csrf
-    @if(isset($application) && $application->id)
-        @method('PUT')
-    @endif
+        
 
             @csrf
             <div id="educationHiddenInputs"></div>
@@ -510,13 +501,16 @@ if(isset($application) && $application->levels){
     </table>
 
  <div id="ppst-container">
-    @include('applicants.ppst-table')
+    @include('admin.ppst-table')
 </div>
 
 
 {{-- ========================================================= --}}
 {{-- III. COMPARATIVE ASSESSMENT RESULT --}}
 {{-- ========================================================= --}}
+<form action="{{ route('admin.scores.update', $application->id) }}" method="POST">
+    @csrf
+    @method('PUT')
 <div id="hr-section">
 <hr class="mt-5 mb-4">
 <h5 class="fw-bold text-uppercase">III. Comparative Assessment Result</h5>
@@ -540,10 +534,11 @@ if(isset($application) && $application->levels){
         <td><input type="number" name="comparative[education]" class="form-control form-control-sm text-center"value="{{ $application->scores->education_points ?? 0 }}"></td>
         <td><input type="number" name="comparative[training]" class="form-control form-control-sm text-center"value="{{ $application->scores->training_points ?? 0 }}"></td>
         <td><input type="number" name="comparative[experience_points]" class="form-control form-control-sm text-center"value="{{ $application->scores->experience_points ?? 0 }}"></td>
-        <td><input type="number" name="comparative[performance]" id="performanceFinal" class="form-control form-control-sm text-center" value="{{ $application->scores->performance_points ?? 0 }}"><button type="button" class="btn btn-sm btn-outline-success"data-bs-toggle="modal" data-bs-target="#performanceModal">Compute</button></td>
-        <td><input type="number" name="comparative[classroom]" class="form-control form-control-sm text-center" id="comparativeClassroom"value="0"></td>
-        <td><input type="number" name="comparative[non_classroom]" class="form-control form-control-sm text-center"id="comparativeNonClassroom"value="0"></td>
-        <td><input type="number" name="comparative[BEI]" class="form-control form-control-sm text-center"></td>
+        <td><input type="number" name="comparative[performance]" id="performanceFinal" class="form-control form-control-sm text-center" value="{{ $application->scores->performance_points ?? 0 }}">
+        <button type="button" class="btn btn-sm btn-outline-success"data-bs-toggle="modal" data-bs-target="#performanceModal">Compute</button></td>
+        <td><input type="number" name="comparative[coi_score]" class="form-control form-control-sm text-center" value="0"></td>
+        <td><input type="number" name="comparative[ncoi_score]" class="form-control form-control-sm text-center" value="0"></td>
+        <td><input type="number" name="comparative[bei_score]" class="form-control form-control-sm text-center" value="0"></td>
         <td><input type="number" name="comparative[total]" class="form-control form-control-sm text-center"></td>
       </tr>
     </tbody>
@@ -697,15 +692,14 @@ if(isset($application) && $application->levels){
     <p class="small mb-0">Concurrent Officer-In-Charge, Office of the Assistant Secretary for Operations</p>
   </div>
 </div>
+<div class="text-center my-4">
+    <button type="submit" class="btn btn-warning btn-lg px-5">
+                    Update Applications
+                </button>
+</div>
         </form>
     </div>
-    <!-- === PRINT & SUBMIT BUTTONS === -->
-    <div class="text-center my-4">
-        <!-- <button type="button" class="btn btn-secondary me-2" onclick="window.print()">🖨️ Print</button> -->
-        <button type="button" id="submitBtn" class="btn btn-success">
-        💾 Submit Application
-    </button>
-</div>
+   
 </div>
 </div>
 </div> <!-- /.container -->
@@ -1123,6 +1117,46 @@ function hideSubmitLoading() {
         $('input[value="'+level+'"]').prop('checked', true);
     });
 }
+</script>
+<script>
+    $(document).ready(function() {
+    // Function para i-compute ang total
+    function calculateTotalScore() {
+    let total = 0;
+    $('input[name^="comparative"]').each(function() {
+        if ($(this).attr('name') !== 'comparative[total]') {
+            let val = parseFloat($(this).val());
+            if (!isNaN(val)) {
+                total += val;
+            }
+        }
+    });
+    $('input[name="comparative[total]"]').val(total.toFixed(3));
+    }
+
+    // Kapag nag manual type ang HR
+    $(document).on('input', 'input[name^="comparative"]', function() {
+        calculateTotalScore();
+    });
+
+    // Tawagin agad pag-load ng page para kung may existing scores, ma-compute ang total
+    $(document).ready(function() {
+        calculateTotalScore();
+    });
+});
+</script>
+<script>
+    $('#adminScoreForm').on('submit', function() {
+
+    // disable ALL education modal inputs
+    $('#educationModal').find('input, select, textarea').prop('disabled', true);
+
+    // disable training, experience, etc (optional)
+    $('#trainingModal, #experienceModal, #eligibilityModal')
+        .find('input, select, textarea')
+        .prop('disabled', true);
+
+});
 </script>
 </body>
 </html>

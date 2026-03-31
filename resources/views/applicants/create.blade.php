@@ -63,12 +63,20 @@
             <input type="hidden" name="experience_points" id="experience_points">
             <input type="hidden" name="experience_remarks" id="remarksExperience">
 
+            <input type="hidden" name="eligibility_remarks" id="eligibility_remarks">
+            
             <input type="hidden" name="performance_points" id="performance_points">
 
             <input type="hidden" name="education[degree]" id="input_education_degree">
             <input type="hidden" name="education[school]" id="input_education_school">
             <input type="hidden" name="education[date_graduated]" id="input_education_date">
             <input type="hidden" name="education[units]" id="input_education_units">
+
+            <!-- ✅ PPST COUNTS (AUTO COMPUTED) -->
+            <input type="hidden" name="coi_outstanding" id="coi_outstanding">
+            <input type="hidden" name="coi_very_satisfactory" id="coi_vs">
+            <input type="hidden" name="ncoi_outstanding" id="ncoi_outstanding">
+            <input type="hidden" name="ncoi_very_satisfactory" id="ncoi_vs">
 
             <input type="hidden" name="ppst_result" id="ppst_result">
             <input type="hidden" name="email" id="applicant_email">

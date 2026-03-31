@@ -9,12 +9,23 @@ use Illuminate\Queue\SerializesModels;
 
 class ApplicationStatusMail extends Mailable
 {
-    public $application;
+    use Queueable, SerializesModels;
 
-    public function __construct($application)
-    {
-        $this->application = $application;
+    public $application;
+    public $finalResultText;
+
+    public function __construct($application, $finalResult)
+{
+    $this->application = $application;
+
+    if ($finalResult === 'qualified') {
+        $this->finalResultText = 'MET ✅';
+    } elseif ($finalResult === 'disqualified') {
+        $this->finalResultText = 'NOT MET ❌';
+    } else {
+        $this->finalResultText = 'IN PROGRESS ⏳';
     }
+}
 
     public function build()
     {
