@@ -98,54 +98,49 @@ const ctpUnits = {
 
 function isEducationDegree(degree) {
 
-    const text = degree.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+    const text = degree.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
 
-    // ============================
-    // 1. MASTER / DOCTOR CHECK FIRST (HIGHEST PRIORITY)
-    // ============================
-    if (/(phd|edd|doctor of|doctorate)/.test(text)) {
-        return true;
-    }
+    // 🔥 EXACT EDUC KEYWORDS ONLY (STRICT)
+    const educKeywords = [
+        'beed',
+        'bsed',
+        'bachelor of elementary education',
+        'bachelor of secondary education',
+        'elementary education',
+        'secondary education',
+        'teacher education',
+        'education degree'
+    ];
 
-    if (/(maed|med|master of|masters of|master in|master's)/.test(text)) {
-        return true;
-    }
-
-    // ============================
-    // 2. STRICT EDUC DEGREE CHECK
-    // (ONLY IF CLEARLY EDUC, NOT JUST "SCIENCE")
-    // ============================
-    if (/(beed|bsed|bachelor of education)/.test(text)) {
-        return true;
-    }
-
-    // ============================
-    // 3. GENERAL EDUC TERMS (LIMITED)
-    // ============================
-    if (/(education|teaching|teacher education)/.test(text)) {
-        return true;
-    }
-
-    // ============================
-    // 4. ❌ EXPLICIT NON-EDUC DEGREE DETECTION
-    // ============================
-    const nonEducIndicators = [
+    // 🔥 NON-EDUC KEYWORDS (HIGH PRIORITY)
+    const nonEducKeywords = [
         'information technology',
         'computer science',
         'engineering',
         'business',
-        'accounting',
+        'accountancy',
         'management',
         'technology',
-        'science' // IMPORTANT: treated as NON-EDUC unless matched earlier
+        'science'
     ];
 
-    // If it only contains "science" WITHOUT education context → NON-EDUC
-    for (let keyword of nonEducIndicators) {
-        if (text.includes(keyword)) {
+    // ❌ CHECK NON-EDUC FIRST
+    for (let word of nonEducKeywords) {
+        if (text.includes(word)) {
             return false;
         }
     }
+
+    // ✅ CHECK EDUC ONLY IF EXACT MATCH
+    for (let word of educKeywords) {
+        if (text.includes(word)) {
+            return true;
+        }
+    }
+
+    // MASTER / DOCTOR (auto valid)
+    if (/(phd|edd|doctor of|doctorate)/.test(text)) return true;
+    if (/(master of|masters of|maed|med|master in)/.test(text)) return true;
 
     return false;
 }
@@ -234,55 +229,86 @@ if (!isEducationDegree(degreeName)) {
 // ================================
 function buildUnitsDropdown(requiredLevel = 0) {
 
-    const select = $('#education_units_select');
+    const educSelect = $('#education_units_select');
+    const ctpSelect = $('#ctp_units_select');
+    const ctpContainer = $('#ctp_container');
+
     const degreeName = ($('#education_name').val() || '')
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9\s]/g, ''); // clean input
+        .replace(/[^a-z0-9\s]/g, '');
 
-    select.empty();
-    select.append('<option value="">Select Education Level</option>');
+     // 🔥 SAVE CURRENT VALUES
+        const currentEducValue = educSelect.val();
+        const currentCtpValue = ctpSelect.val();
 
-    // ============================
-    // DEGREE TYPE DETECTION (SAFE + PRIORITY)
-    // ============================
+        // 🔥 CLEAR FIRST (IMPORTANT)
+        educSelect.empty();
+        ctpSelect.empty();
 
-    const isDoctor = /(phd|edd|doctor of|doctorate)/.test(degreeName);
+        // ADD DEFAULT OPTIONS
+        educSelect.append('<option value="">Select Education Level</option>');
+        ctpSelect.append('<option value="">Select CTP Units</option>');
 
-    const isMaster = (
-    /(master|masters|master's|maed|med|ms|ma|m\.a|m\.s|m\.ed)/i.test(degreeName)
-    || degreeName.includes('master of')
-    || degreeName.includes('master in')
-);
-
+    const isMaster = /\b(master|master's|maed|med|ms|ma)\b/i.test(degreeName);
+    const isDoctor = /\b(phd|edd|doctor of|doctorate)\b/i.test(degreeName);
     const isEduc = isEducationDegree(degreeName);
 
     // ============================
-    // NON EDUC DEGREE → CTP ONLY
+    // 🔥 NON-EDUC DEGREE → CTP MODE
     // ============================
     if (degreeName && !isEduc && !isMaster && !isDoctor) {
 
-        Object.entries(ctpUnits).forEach(([label, value]) => {
-            select.append(`<option value="${value}">${label}</option>`);
-        });
+        // 🔥 FORCE RESET EDUC DROPDOWN
+        educSelect.val('');
+        educSelect.prop('disabled', true);
 
+        // 🔥 SHOW CTP
+        ctpContainer.removeClass('d-none');
+
+        Object.entries(ctpUnits).forEach(([label, value]) => {
+            ctpSelect.append(`<option value="${value}">${label}</option>`);
+        });
+        // 🔥 RESTORE VALUE
+        if (currentCtpValue) {
+            ctpSelect.val(currentCtpValue);
+        }
         return;
     }
 
     // ============================
-    // EDUC / MASTER / DOCTOR → NORMAL UNITS
+    // ✅ EDUC DEGREE → NORMAL MODE
     // ============================
+    // 🔥 RESET CTP
+    ctpSelect.val('');
+
+    // ENABLE EDUC
+    educSelect.prop('disabled', false);
+
+    // HIDE CTP
+    ctpContainer.addClass('d-none');
+
     Object.entries(educationLevels)
         .filter(([label, value]) => value >= requiredLevel)
         .forEach(([label, value]) => {
-            select.append(`<option value="${value}">${label}</option>`);
+            educSelect.append(`<option value="${value}">${label}</option>`);
         });
+        // 🔥 RESTORE VALUE
+        if (currentEducValue) {
+            educSelect.val(currentEducValue);
+        }
 }
 
 // ================================
 // GET FINAL UNITS (INCLUDING OTHERS)
 // ================================
 function getFinalUnits() {
+    const name = $('#education_name').val();
+
+    if (!isEducationDegree(name)) {
+        return parseInt($('#ctp_units_select').val()) || 0;
+    }
+
     return parseInt($('#education_units_select').val()) || 0;
 }
 
@@ -324,27 +350,33 @@ function showQSUnits() {
 // ================================
 function evaluateEducation() {
     const level = $('#school_level').val();
-    const position = $('#position_applied').val().toLowerCase();
-    const education = $('#education_name').val().trim().toLowerCase();
-    const selectedUnits = getFinalUnits();
+    const position = ($('#position_applied').val() || '').toLowerCase();
+    const education = ($('#education_name').val() || '').trim().toLowerCase();
 
-    // 🔥 FIX: If kulang pa inputs → WAITING
-    if (!education || !selectedUnits) {
+    const units = getFinalUnits(); // 🔥 SINGLE SOURCE OF TRUTH
+
+    // ================================
+    // WAITING STATE
+    // ================================
+    if (!education || !units) {
         $('#modal_education_remark').html('<span class="text-muted">Waiting for the QS</span>');
         return;
     }
 
     let isDegreeValid = false;
-    
-    // EXPANDED BACHELOR'S PATTERNS
-    const bachelorPattern = /(bachelor|bachelor's|baccalaureate|bs|ba|bed|beed|b\.?ed|b\.?a|b\.?s|bse|bst|bsc|ab|bsed|bat|blis|bpa|bped|bsee|bsie|bsem|bshm|bsit|bsn|bspa|bsrt|bssw|bsba|bscs|bsis|bsmath|bsstat|bstm|bsmt|bscpe|bsce|bsae|bsme|bsche|bsee|bsn|bsp|bspt|bsot|bsmls|bspharm|bspsych|bssoc|bscrim|bspolsci|bsed|elementary education|secondary education|teacher education|education degree|teaching degree)/i;
-    
-    // EXPANDED MASTER'S PATTERNS
-    const masterPattern = /(master|master's|ma|ms|m\.a|m\.s|med|maed|m\.?ed|master of arts|master of science|master of education|master of teaching|master in education|master in teaching|msed|mst|mba|mpa|mha|mhm|mhr|mim|mib|mfa|mdes|march|mlis|mdiv|mth|mts|mph|msp|mstat|mfin|macc|mtax|mem|meng|mse|msc|msi|msm|msn|msw|mpm|mppm|mppa|mpp|mrp|mcrp|musm|mupa|mup|murp|mcp|mcj|ml|llm|mcl|mcr|mdr|mdm|mhm|mhrm|mib|mim|min|mip|mir|mis|mit|mkt|ml|mm|mmc|mmet|mme|mmed|mmgt|mmis|mmpa|mms|mnce|mns|mnt|mnut|mpe|mped|mph|mphe|mpil|mpl|mpr|mps|mpt|mrp|mrs|msa|msba|msc|msce|mscs|msd|mse|msec|msed|msf|msg|msh|msi|msis|msit|msm|msme|msn|mso|msp|mss|mssc|mssw|mst|msta|msts|msw|mth|mts|mtax|mte|mtech|mtm|mts|mtt|mu|mup|mur|mus|mva|mvd|mvs|mwd|my)/i;
-    
-    // EXPANDED DOCTORATE PATTERNS
-    const doctorPattern = /(doctor|doctorate|ph\.?d|phd|edd|ed\.?d|dr\.|d\.?ed|dma|dba|deng|dsc|dphil|jd|md|dmd|dds|dvm|pharm\.?d|psyd|dnp|dpt|dot|dlitt|dmus|dsocsc|dtech|darch|jur\.?d|sc\.?d|ll\.?d|th\.?d|div|st\.?d|drph|drphil|drrer\.?nat|dr\.?ing|dr\.?med|dr\.?jur|dr\.?phil|dr\.?rer\.?nat|dr\.?sc|dr\.?tech|doctoral|doctor of philosophy|doctor of education)/i;
 
+    // ================================
+    // DEGREE PATTERNS
+    // ================================
+    const bachelorPattern = /(bachelor|baccalaureate|bs|ba|beed|bsed|education|teaching)/i;
+
+    const masterPattern = /(master|ma|ms|med|maed|m\.?ed)/i;
+
+    const doctorPattern = /(doctor|phd|edd|doctorate)/i;
+
+    // ================================
+    // DEGREE VALIDATION
+    // ================================
     if (position.includes('master teacher')) {
         isDegreeValid = masterPattern.test(education) || doctorPattern.test(education);
     } else if (position.includes('teacher')) {
@@ -352,26 +384,32 @@ function evaluateEducation() {
     }
 
     const requiredLevel = positionRequiredLevel[position] || BASE_LEVEL;
-    const userLevel = parseInt(selectedUnits) || 0;
+
     // ================================
-// NON EDUC DEGREE CTP RULE
-// ================================
+    // 🔥 NON-EDUC DEGREE → CTP RULE (FINAL FIX)
+    // ================================
+    if (!isEducationDegree(education) && position.includes('teacher')) {
 
-if (!isEducationDegree(education) && position.includes('teacher')) {
+        const ctpValue = parseInt($('#ctp_units_select').val()) || 0;
 
-    if (userLevel >= 11) {
+        console.log("CTP VALUE:", ctpValue); // 🔥 DEBUG
+
+        if (ctpValue >= 11) {
+            $('#modal_education_remark').html('<span class="text-success fw-bold">MET</span>');
+        } else {
+            $('#modal_education_remark').html('<span class="text-danger fw-bold">NOT MET</span>');
+        }
+
+        return; // ✅ STOP HERE (IMPORTANT)
+    }
+
+    // ================================
+    // NORMAL EDUC DEGREE LOGIC
+    // ================================
+    if (isDegreeValid && units >= requiredLevel) {
         $('#modal_education_remark').html('<span class="text-success fw-bold">MET</span>');
     } else {
         $('#modal_education_remark').html('<span class="text-danger fw-bold">NOT MET</span>');
-    }
-
-    return; // STOP evaluation here
-}
-
-    if (isDegreeValid && userLevel >= requiredLevel) {
-        $('#modal_education_remark').html(`<span class="text-success fw-bold">MET</span>`);
-    } else {
-        $('#modal_education_remark').html(`<span class="text-danger fw-bold">NOT MET</span>`);
     }
 }
 
@@ -379,46 +417,63 @@ if (!isEducationDegree(education) && position.includes('teacher')) {
 // UPDATE EDUCATION SUMMARY LIVE (UPDATED FOR NEW MODAL DESIGN)
 // ================================
 function updateEducationSummaryLive() {
-    const name = $('#education_name').val().trim() || '—';
-    const selectedOption = $('#education_units_select option:selected');
-    const level = parseInt(selectedOption.val()) || 0;
-    const position = $('#position_applied').val();
+
+    const name = $('#education_name').val().trim();
+    const position = ($('#position_applied').val() || '').toLowerCase();
 
     if (!position) return;
 
-    const result = computeEducationPoints(position, level, name);
-    const unitsLabel = selectedOption.text() || '—';
+    const isEduc = isEducationDegree(name);
 
-    $('#edu_degree_display').text(name);
-    $('#edu_level_display').text(unitsLabel);
-    $('#edu_points_display').text(
-    `${result.points} ${result.points === 1 ? 'point' : 'points'}`
-);
+    // 🔥 GET REAL VALUE
+    const units = getFinalUnits();
+
+    // 🔥 GET LABEL
+    let unitsLabel = '—';
+
+    if (!isEduc) {
+        unitsLabel = $('#ctp_units_select option:selected').text();
+    } else {
+        unitsLabel = $('#education_units_select option:selected').text();
+    }
+
+    const result = computeEducationPoints(position, units, name);
+
+    $('#edu_degree_display').text(name || '—');
+    $('#edu_level_display').text(unitsLabel || '—');
+    $('#edu_points_display').text(`${result.points} points`);
 
     let status = 'WAITING';
 
-// 🔥 If kulang pa → WAITING muna
-if (!name || !level) {
-    status = 'WAITING';
-} else {
-    if (!isEducationDegree(name) && position.toLowerCase().includes('teacher')) {
-        status = level >= 11 ? 'MET' : 'NOT MET';
+    if (!name || !units) {
+        status = 'WAITING';
     } else {
-        status = result.userLevel >= result.requiredLevel ? 'MET' : 'NOT MET';
+        if (!isEduc && position.includes('teacher')) {
+            status = units >= 11 ? 'MET' : 'NOT MET';
+        } else {
+            status = result.userLevel >= result.requiredLevel ? 'MET' : 'NOT MET';
+        }
     }
-}
 
     if (status === 'MET') {
         $('#edu_status_display')
             .text('MET')
             .removeClass('text-muted text-danger')
             .addClass('text-success fw-bold');
-    } else {
+    } else if (status === 'NOT MET') {
         $('#edu_status_display')
             .text('NOT MET')
             .removeClass('text-muted text-success')
             .addClass('text-danger fw-bold');
+    } else {
+        $('#edu_status_display')
+            .text('Waiting..')
+            .removeClass('text-success text-danger')
+            .addClass('text-muted');
     }
+
+    console.log("UNITS:", units); // 🔥 DEBUG
+
 
     // ✅ Always render Non-Educ degree notice
     const notice = !isEducationDegree(name) && position.toLowerCase().includes('teacher')
@@ -449,20 +504,17 @@ if (!name || !level) {
 // ================================
 // INITIALIZE DROPDOWN ON MODAL SHOW
 // ================================
-$(document).on('show.bs.modal', '#educationModal', function() {
+$(document).on('shown.bs.modal', '#educationModal', function() {
     setTimeout(function() {
-        const currentVal = $('#education_units_select').val();
         const currentName = $('#education_name').val().trim();
 
-        // Only rebuild dropdown if empty
-        if (!currentVal) {
-            showQSUnits();              
+        // 🔹 Rebuild dropdown lang kung wala pang value o degree name nagbago
+        if (currentName) {
+            showQSUnits();   // automatic detect Education / Non-Education
         }
 
-        // Only update summary if degree name exists
-        if (currentName) {
-            updateEducationSummaryLive();
-        }
+        // 🔹 Update summary sa lahat ng cases
+        updateEducationSummaryLive();
     }, 100);
 });
 
@@ -486,6 +538,12 @@ $(document).ready(function() {
     // EDUCATION NAME CHANGE
     $('#education_name').on('input', function() {
         showQSUnits(); // rebuild dropdown depending on degree type
+        evaluateEducation();
+        updateEducationSummaryLive();
+    });
+
+    // ✅ CTP DROPDOWN LISTENER (FIX)
+    $('#ctp_units_select').on('change', function() {
         evaluateEducation();
         updateEducationSummaryLive();
     });
@@ -554,11 +612,23 @@ $('#saveEducation').on('click', function() {
     const name = $('#education_name').val().trim();
     const school = $('#education_school').val().trim();
     const date = $('#education_date').val();
-    const units = getFinalUnits();
-    const selectedOption = $('#education_units_select option:selected');
-    const unitsLabel = selectedOption.text();
     const file = $('#education_file')[0].files[0];
-    const position = $('#position_applied').val();
+    const position = ($('#position_applied').val() || '').toLowerCase();
+
+    // =========================
+    // 🔥 GET CORRECT UNITS + LABEL (FIXED)
+    // =========================
+    let units;
+    let unitsLabel;
+
+    if (!isEducationDegree(name)) {
+        units = parseInt($('#ctp_units_select').val()) || 0;
+        unitsLabel = $('#ctp_units_select option:selected').text();
+    } else {
+        units = parseInt($('#education_units_select').val()) || 0;
+        unitsLabel = $('#education_units_select option:selected').text();
+    }
+    $('#input_education_units').val(unitsLabel);   
 
     // =========================
     // VALIDATION
@@ -582,13 +652,16 @@ $('#saveEducation').on('click', function() {
     const result = computeEducationPoints(position, units, name);
 
     // =========================
-    // COMPUTE REMARKS (MAS SAFE)
+    // 🔥 COMPUTE REMARKS (FINAL FIX)
     // =========================
     let remarkText = '';
 
-    if (!isEducationDegree(name) && position.toLowerCase().includes('teacher')) {
+    // NON-EDUC (CTP RULE)
+    if (!isEducationDegree(name) && position.includes('teacher')) {
         remarkText = units >= 11 ? 'MET' : 'NOT MET';
-    } else {
+    } 
+    // NORMAL EDUC
+    else {
         remarkText = result.userLevel >= result.requiredLevel ? 'MET' : 'NOT MET';
     }
 
@@ -599,14 +672,14 @@ $('#saveEducation').on('click', function() {
     $('#remarksEducation').val(remarkText);
 
     // =========================
-    // UI STATUS (DISPLAY LANG)
+    // UI STATUS
     // =========================
     let status = remarkText === 'MET'
         ? '<span class="text-success fw-bold">MET</span>'
         : '<span class="text-danger fw-bold">NOT MET</span>';
 
     // =========================
-    // UPDATE SUMMARY
+    // 🔥 UPDATE SUMMARY (FIXED LABEL)
     // =========================
     $('#education_summary').html(`
         <small><strong>${name}</strong></small><br>

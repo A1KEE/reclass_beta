@@ -163,64 +163,6 @@ body {
 .bg-primary-subtle {
     background-color: #cfe2ff !important;
 }
-/* ========================================
-   EDUCATION MODAL STRUCTURE
-======================================== */
-
-#educationModal .modal-body {
-    max-height: 85vh;
-    overflow-y: auto;
-}
-
-/* LEFT SIDE (RUBRICS) */
-.education-rubrics-sticky {
-    position: sticky;
-    top: 15px;
-    align-self: flex-start;
-}
-
-/* RIGHT SIDE (FORM) */
-.education-form-scroll {
-    max-height: none;
-    overflow: visible;
-}
-
-/* Responsive Fix */
-@media (max-width: 768px) {
-
-    .education-rubrics-sticky {
-        position: relative;
-        top: 0;
-        margin-bottom: 20px;
-    }
-
-}
-
-/* Theme */
-.bg-light-green {
-    background-color: #e9f7ef !important;
-}
-
-.border-light-green {
-    border-left: 4px solid #28a745 !important;
-}
-
-.text-green {
-    color: #1e7e34 !important;
-}
-
-.education-modal-border {
-    border: 1px solid #ced4da;
-}
-
-.education-modal-border-dashed {
-    border: 2px dashed #ced4da;
-}
-
-.education-modal-form-text {
-    font-size: 13px;
-    color: #6c757d;
-}
 /* COI - YELLOW */
 .row-coi {
   background-color: #fff8e1;
@@ -440,41 +382,183 @@ table.table thead th {
 input[name="levels[]"] {
     cursor: not-allowed;
 }
-/* EDUCATION STYLE MODAL */
-/* Sticky Rubrics */
-.education-rubrics-sticky {
-    max-height: calc(100vh - 250px); /* Mas maliit na value para siguradong kita */
+/* =======================================
+   EDUCATION MODAL - CLEAN UNIFORM DESIGN
+======================================= */
+
+/* 🔥 GLOBAL FONT (COMPACT + CONSISTENT) */
+#educationModal {
+    font-size: 0.9rem;
+}
+
+#educationModal .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+#educationModal .form-control,
+#educationModal .form-select {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+/* INPUT HEIGHT FIX */
+#educationModal input[type="date"],
+#educationModal select {
+    height: 36px;
+}
+
+/* =======================================
+   MODAL SCROLL
+======================================= */
+#educationModal .modal-body {
+    max-height: 85vh;
     overflow-y: auto;
 }
 
-/* Make summary card not shrink and stay at bottom */
-.education-rubrics-sticky .card:last-child {
-    margin-top: auto; /* Pushes it to bottom */
-    flex-shrink: 0; /* Prevents shrinking */
+/* =======================================
+   LEFT SIDE (RUBRICS + SUMMARY UNIFORM)
+======================================= */
+.education-rubrics-sticky {
+    position: sticky;
+    top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 🔥 consistent spacing */
 }
 
-/* Light green theme */
+/* 🔥 MAKE BOTH CARDS IDENTICAL STYLE */
+.education-rubrics-sticky .card {
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #28a745;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* 🔥 SAME HEADER STYLE */
+.education-rubrics-sticky .card-header {
+    background-color: #f8f9fa;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 12px;
+}
+
+/* 🔥 SAME BODY STYLE */
+.education-rubrics-sticky .card-body {
+    font-size: 0.83rem;
+    padding: 12px;
+}
+
+/* REMOVE EXTRA STYLE DIFFERENCE */
 .bg-light-green {
-  background-color: #e9f7ef; /* light green */
+    background-color: #f8f9fa !important;
 }
 
 .border-light-green {
-  border-left: 4px solid #28a745;
+    border-left: 4px solid #28a745 !important;
 }
 
 .text-green {
-  color: #1e7e34;
+    color: #198754 !important;
 }
 
-/* Ensure content in summary card is visible */
-#modal_education_summary,
-.education-rubrics-sticky .card:last-child {
-    overflow: visible !important;
+/* =======================================
+   RUBRICS LIST IMPROVED
+======================================= */
+.education-rubrics-sticky .list-group-item {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    border: none;
+    border-bottom: 1px solid #f1f1f1;
 }
 
-/* Add this to ensure proper spacing */
-.education-rubrics-sticky .card {
-    flex-shrink: 0; /* Prevent cards from shrinking */
+.education-rubrics-sticky .list-group-item:last-child {
+    border-bottom: none;
+}
+
+/* =======================================
+   SUMMARY CARD (LOOK LIKE RUBRICS)
+======================================= */
+#modal_education_summary {
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+/* 🔥 LABEL STYLE */
+#modal_education_summary strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+/* =======================================
+   RIGHT SIDE FORM
+======================================= */
+.education-form-scroll {
+    max-height: none;
+    overflow: visible;
+}
+
+/* =======================================
+   ROW SPACING
+======================================= */
+#educationModal .row.g-4 {
+    --bs-gutter-y: 0.8rem;
+}
+
+#educationModal .row.g-3 {
+    --bs-gutter-y: 0.6rem;
+}
+
+/* =======================================
+   FILE UPLOAD DESIGN
+======================================= */
+.education-modal-border-dashed {
+    border: 2px dashed #ced4da;
+    transition: 0.2s;
+}
+
+.education-modal-border-dashed:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+/* =======================================
+   INPUT BORDER CLEAN
+======================================= */
+.education-modal-border {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+}
+
+/* =======================================
+   SMALL TEXT
+======================================= */
+.education-modal-form-text {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* =======================================
+   MOBILE FIX
+======================================= */
+@media (max-width: 768px) {
+
+    #educationModal {
+        font-size: 0.85rem;
+    }
+
+    .education-rubrics-sticky {
+        position: relative;
+        top: 0;
+    }
+
+    #educationModal .col-md-4,
+    #educationModal .col-md-3,
+    #educationModal .col-md-5 {
+        width: 100%;
+    }
 }
 /* ================= TRAINING MODAL DESIGN ================= */
 

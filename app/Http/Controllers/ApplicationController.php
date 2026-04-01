@@ -121,7 +121,7 @@ public function store(Request $request)
             'degree' => $request->education['degree'] ?? null,
             'school' => $request->education['school'] ?? null,
             'date_graduated' => $request->education['date_graduated'] ?? null,
-            'units' => $request->education['level'] ?? null,
+            'units'            => $request->education['units'] ?? null,
             'file_path' => $filePath,
         ]);
     }
