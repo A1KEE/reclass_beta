@@ -33,14 +33,18 @@ class AuthenticatedSessionController extends Controller
         // 🔥 ROLE-BASED (SPATIE)
         // =========================
         if ($user->hasRole('admin')) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         if ($user->hasRole('applicant')) {
-            return redirect()->route('applicant.dashboard');
+            return redirect()->intended(route('applicant.dashboard'));
         }
 
-        return redirect('/');
+       Auth::logout();
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'User has no assigned role.'
+        ]);
     }
 
     public function destroy(Request $request)

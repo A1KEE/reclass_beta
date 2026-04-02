@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ChangePasswordController;
 use Illuminate\Http\Request;
 use Smalot\PdfParser\Parser;
 
@@ -46,44 +47,46 @@ Route::get('/load-ppst', [ApplicationController::class, 'loadPPST']);
 |--------------------------------------------------------------------------
 */
 
+// 🔐 CHANGE PASSWORD (any logged user)
 Route::middleware(['auth'])->group(function () {
 
-// 🔥 CHANGE PASSWORD PAGE
     Route::get('/change-password', [ChangePasswordController::class, 'index'])
         ->name('change.password');
 
-    // 🔥 SAVE NEW PASSWORD
     Route::post('/change-password', [ChangePasswordController::class, 'update'])
         ->name('change.password.update');
+});
 
-        Route::get('/applicant/dashboard', function () {
-        return "Applicant Dashboard";
+
+Route::middleware(['auth', 'role:applicant'])->group(function () {
+
+    Route::get('/applicant/dashboard', function () {
+        return view('applicants.dashboard');
     })->name('applicant.dashboard');
 
+});
 
-    Route::prefix('admin')->group(function () {
 
-        // Dashboard
+// 🔥 ADMIN ONLY
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+
         Route::get('/dashboard', [AdminController::class, 'dashboard'])
             ->name('admin.dashboard');
 
-        // Applicants list
         Route::get('/applicants', [AdminController::class, 'applicants'])
             ->name('admin.applicants');
 
-        // View applicant details
         Route::get('/applicants/{id}', [AdminController::class, 'show'])
             ->name('admin.applicants.show');
 
-        Route::post('/admin/applicants/{id}/status', [AdminController::class, 'updateStatus'])
-        ->name('admin.applicants.status');
+        Route::post('/applicants/{id}/status', [AdminController::class, 'updateStatus'])
+            ->name('admin.applicants.status');
 
-        Route::get('/admin/settings', [AdminController::class, 'settings'])
-        ->name('admin.settings')
-        ->middleware('auth');
+        Route::get('/settings', [AdminController::class, 'settings'])
+            ->name('admin.settings');
 
-        Route::put('/admin/scores/{id}', [AdminController::class, 'update'])
-    ->name('admin.scores.update');
-    });
-
+        Route::put('/scores/{id}', [AdminController::class, 'update'])
+            ->name('admin.scores.update');
 });
