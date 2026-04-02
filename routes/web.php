@@ -48,6 +48,19 @@ Route::get('/load-ppst', [ApplicationController::class, 'loadPPST']);
 
 Route::middleware(['auth'])->group(function () {
 
+// 🔥 CHANGE PASSWORD PAGE
+    Route::get('/change-password', [ChangePasswordController::class, 'index'])
+        ->name('change.password');
+
+    // 🔥 SAVE NEW PASSWORD
+    Route::post('/change-password', [ChangePasswordController::class, 'update'])
+        ->name('change.password.update');
+
+        Route::get('/applicant/dashboard', function () {
+        return "Applicant Dashboard";
+    })->name('applicant.dashboard');
+
+
     Route::prefix('admin')->group(function () {
 
         // Dashboard

@@ -9,7 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
+   <style>
         /* LEFT SIDE */
         .left-side {
             background: url('{{ asset('images/division.jpg') }}') center center/cover no-repeat;
@@ -28,10 +28,10 @@
         }
 
         /* RIGHT SIDE */
-        .card-form {
+        .login-card {
             width: 400px;
         }
-        .card-form .card-body {
+        .login-card .card-body {
             padding: 2.5rem;
         }
         .footer-text {
@@ -68,15 +68,47 @@
 <div class="container-fluid vh-100">
     <div class="row h-100">
 
-        <!-- LEFT SIDE -->
-        <div class="col-md-8 d-none d-md-flex left-side align-items-center justify-content-center">
-            <div class="left-overlay"></div>
-            <div class="text-center left-content px-4">
-                <p class="lead">Department of Education</p>
-                <h3 class="fw-bold">RECLASSIFICATION FORM FOR TEACHING POSITIONS (RFTP)</h3><br>
-                <small>Empowering quality educators through a transparent and efficient hiring process.</small>
+  <!-- LEFT SIDE -->
+<div class="col-md-8 d-none d-md-flex left-side align-items-center justify-content-center">
+    <div class="left-overlay"></div>
+
+    <div class="text-center left-content px-4">
+
+        <!-- HEADER (MOVED HIGHER) -->
+        <div style="margin-top: -80px;">
+
+            <!-- LOGOS -->
+            <div class="d-flex justify-content-center align-items-center gap-3 mb-2">
+                <img src="{{ asset('images/depEd-logo.png') }}" alt="DepEd Logo" style="height: 80px;">
+                <img src="{{ asset('images/do-logo.png') }}" alt="DO Logo" style="height: 80px;">
             </div>
+
+            <!-- REPUBLIC TITLE -->
+            <div class="dep-rc-title"
+                 style="font-size: 11pt; font-family: 'OldEnglishTextMT', 'Old English Text MT', serif;">
+                Republika ng Pilipinas
+            </div>
+
+            <!-- DEPARTMENT -->
+            <p class="lead mb-0"
+               style="font-size: 16pt; font-family: 'OldEnglishTextMT', 'Old English Text MT', serif;">
+                Department of Education
+            </p><br><br>
+
         </div>
+
+        <!-- RFTP (UNCHANGED) -->
+        <h3 class="fw-bold mt-3">
+            RECLASSIFICATION FORM FOR TEACHING POSITIONS (RFTP)
+        </h3><br>
+
+        <!-- TAGLINE (SLIGHTLY LOWERED) -->
+        <small class="d-block mt-4">
+            <i>Empowering quality educators through a transparent and efficient hiring process.</i>
+        </small>
+
+    </div>
+</div>
 
         <!-- RIGHT SIDE: FORGOT PASSWORD FORM -->
         <div class="col-12 col-md-4 d-flex align-items-center justify-content-center">
@@ -120,7 +152,7 @@
                     </form>
 
                     <div class="footer-text mt-3">
-                        &copy; {{ date('Y') }} Information & Communication Technology Unit(ICTU)
+                        &copy; {{ date('Y') }} Information & Communication Technology Unit (ICTU)
                     </div>
                 </div>
             </div>

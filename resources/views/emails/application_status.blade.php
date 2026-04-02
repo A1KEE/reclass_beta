@@ -21,6 +21,33 @@
     School: {{ $application->school_name }}
 </p>
 
+@if($password)
+
+<hr>
+
+<h3>🔐 Your Account Details</h3>
+
+<p>
+    <strong>Login Link:</strong><br>
+    <a href="{{ url('/login') }}">{{ url('/login') }}</a>
+</p>
+
+<p>
+    <strong>Username (Email):</strong><br>
+    {{ $application->email }}
+</p>
+
+<p>
+    <strong>Temporary Password:</strong><br>
+    {{ $password }}
+</p>
+
+<p style="color:red;">
+    ⚠ Please login and change your password immediately.
+</p>
+
+@endif
+
 <p>Regards,<br>SDO HR Department</p>
 
 </body>

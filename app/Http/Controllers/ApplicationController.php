@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\Application;
 use App\Models\School;
@@ -16,6 +17,7 @@ use App\Models\Eligibility;
 use App\Models\Ipcrf;
 use App\Models\ApplicationPpstRating;
 use App\Models\PpstIndicator;
+use App\Models\User;
 use App\Mail\ApplicationStatusMail;
 
 class ApplicationController extends Controller
@@ -63,8 +65,30 @@ public function store(Request $request)
         'last_activity_at' => now(),
     ]);
 
-    $applicantId = $application->id;
+   $applicantId = $application->id;
 
+// =========================
+// 🔥 CREATE USER ACCOUNT IF QUALIFIED
+// =========================
+if (strtolower($request->ppst_result ?? '') === 'qualified') {
+
+    $existingUser = User::where('email', $request->email)->first();
+
+    if (!$existingUser) {
+
+        $defaultPassword = Str::random(8);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($defaultPassword),
+            'application_id' => $application->id,
+            'must_change_password' => 1
+        ]);
+
+        $user->assignRole('applicant');
+    }
+}
     // =========================
     // 3️⃣ CREATE BASE FOLDER
     // =========================
@@ -80,9 +104,9 @@ public function store(Request $request)
     if ($request->trainings) {
         foreach ($request->trainings as $index => $training) {
 
-            if ($request->hasFile("trainings.$index.file")) {
+           if ($request->hasFile("trainings.$index.file")) {
 
-                $file = $training['file'];
+                $file = $request->file("trainings.$index.file");
 
                 $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $training['title'] ?? 'training');
 
@@ -106,7 +130,7 @@ public function store(Request $request)
     // =========================
     // 5️⃣ EDUCATION
     // =========================
-    if ($request->file('education.file')) {
+    if ($request->hasFile('education.file')) {
 
         $file = $request->file('education.file');
 
@@ -188,11 +212,11 @@ public function store(Request $request)
     // =========================
    if($request->has('ipcrf_files')){
     
-    foreach($request->ipcrf_files as $ipcrf){
+    foreach ($request->ipcrf_files as $index => $ipcrf) {
 
-        if(isset($ipcrf['file'])){
+        if ($request->hasFile("ipcrf_files.$index.file")) {
 
-            $file = $ipcrf['file'];
+            $file = $request->file("ipcrf_files.$index.file");
 
             $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $ipcrf['title'] ?? 'ipcrf');
 
@@ -277,16 +301,34 @@ if ($request->has('ppst')) {
         ]
     );
 
-    try {
+    \DB::beginTransaction();
 
-       Mail::to($application->email)
-    ->send(new ApplicationStatusMail($application, $request->ppst_result));
+try {
 
-    } catch (\Exception $e) {
+    // =========================
+    // 👉 LAHAT NG CODE MO (buong store)
+    // =========================
 
-        \Log::error('Mail Error: ' . $e->getMessage());
+    Mail::to($application->email)
+        ->send(new ApplicationStatusMail(
+            $application,
+            $request->ppst_result,
+            $defaultPassword ?? null
+        ));
 
-    }
+    \DB::commit();
+
+} catch (\Throwable $e) {
+
+    \DB::rollback();
+
+    dd(
+        'ERROR FOUND:',
+        $e->getMessage(),
+        'FILE:', $e->getFile(),
+        'LINE:', $e->getLine()
+    );
+}
     return redirect()->back()->with('success', 'Application submitted successfully.');
 }
     /* =====================================================

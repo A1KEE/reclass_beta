@@ -68,72 +68,133 @@
 <div class="container-fluid vh-100">
     <div class="row h-100">
 
-        <!-- LEFT SIDE -->
-        <div class="col-md-8 d-none d-md-flex left-side align-items-center justify-content-center">
-            <div class="left-overlay"></div>
-            <div class="text-center left-content px-4">
-                <p class="lead">Department of Education</p>
-                <h3 class="fw-bold">RECLASSIFICATION FORM FOR TEACHING POSITIONS (RFTP)</h3><br>
-                <small>Empowering quality educators through a transparent and efficient hiring process.</small>
+  <!-- LEFT SIDE -->
+<div class="col-md-8 d-none d-md-flex left-side align-items-center justify-content-center">
+    <div class="left-overlay"></div>
+
+    <div class="text-center left-content px-4">
+
+        <!-- HEADER (MOVED HIGHER) -->
+        <div style="margin-top: -80px;">
+
+            <!-- LOGOS -->
+            <div class="d-flex justify-content-center align-items-center gap-3 mb-2">
+                <img src="{{ asset('images/depEd-logo.png') }}" alt="DepEd Logo" style="height: 80px;">
+                <img src="{{ asset('images/do-logo.png') }}" alt="DO Logo" style="height: 80px;">
             </div>
+
+            <!-- REPUBLIC TITLE -->
+            <div class="dep-rc-title"
+                 style="font-size: 11pt; font-family: 'OldEnglishTextMT', 'Old English Text MT', serif;">
+                Republika ng Pilipinas
+            </div>
+
+            <!-- DEPARTMENT -->
+            <p class="lead mb-0"
+               style="font-size: 16pt; font-family: 'OldEnglishTextMT', 'Old English Text MT', serif;">
+                Department of Education
+            </p>
+            <p class="lead mb-0"
+               style="font-size: 17pt;">
+                Schools Division Office of Valenzuela City
+            </p>
+            <p class="lead mb-0"
+               style="font-size: 10pt;">
+                Pio Valenzuela Street, Brgy. Marulas, Valenzuela City, 1440
+            </p><br><br>
+
         </div>
 
-        <!-- RIGHT SIDE: LOGIN FORM -->
-        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center">
-            <div class="card shadow login-card mx-auto">
-                <div class="card-body text-center">
-                    <!-- Centered Logo -->
-                    <img src="{{ asset('images/DO-LOGO.png') }}" class="logo-img">
-                    <h4 class="fw-bold mb-4">Login Account</h4>
+        <!-- RFTP (UNCHANGED) -->
+        <h3 class="fw-bold mt-3">
+            RECLASSIFICATION FORM FOR TEACHING POSITIONS (RFTP)
+        </h3><br>
 
-                    <!-- Session Status -->
-                    @if (session('status'))
-                        <div class="alert alert-success">{{ session('status') }}</div>
-                    @endif
+        <!-- TAGLINE (SLIGHTLY LOWERED) -->
+        <small class="d-block mt-4">
+            <i>Empowering quality educators through a transparent and efficient hiring process.</i>
+        </small>
 
-                    <!-- Validation Errors -->
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+    </div>
+</div>
+        
+<!-- RIGHT SIDE: LOGIN FORM -->
+<div class="col-12 col-md-4 d-flex align-items-center justify-content-center">
+    <div class="card shadow login-card mx-auto border-0">
+        <div class="card-body px-4 py-5">
 
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-                        <div class="mb-3 text-start">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control" required autofocus>
-                        </div>
+            <!-- TITLE -->
+            <div class="text-center mb-4">
+                <h4 class="fw-semibold login-title">Sign in</h4>
+                <p class="text-muted small mb-0">Access your account</p>
+            </div>
 
-                        <div class="mb-3 text-start">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" name="password" id="password" class="form-control" required>
-                        </div>
+            <!-- Session Status -->
+            @if (session('status'))
+                <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
 
-                        <div class="mb-3 form-check text-start">
-                            <input type="checkbox" name="remember" class="form-check-input" id="remember_me">
-                            <label class="form-check-label" for="remember_me">Remember me</label>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}">Forgot password?</a>
-                            @endif
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </div>
-                    </form>
-
-                    <div class="footer-text mt-5">
-                        &copy; {{ date('Y') }} Information & Communication Technology Unit(ICTU)
-                    </div>
+            <!-- Validation Errors -->
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0 small">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-            </div>
-        </div>
+            @endif
 
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <!-- EMAIL -->
+                <div class="mb-3">
+                    <label for="email" class="form-label small text-muted">Email</label>
+                    <input type="email" name="email" id="email"
+                        value="{{ old('email') }}"
+                        class="form-control modern-input"
+                        placeholder="Enter your email"
+                        required autofocus>
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="mb-3">
+                    <label for="password" class="form-label small text-muted">Password</label>
+                    <input type="password" name="password" id="password"
+                        class="form-control modern-input"
+                        placeholder="Enter your password"
+                        required>
+                </div>
+
+                <!-- REMEMBER -->
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="remember" class="form-check-input" id="remember_me">
+                    <label class="form-check-label small text-muted" for="remember_me">
+                        Remember me
+                    </label>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="small text-decoration-none">
+                            Forgot password?
+                        </a>
+                    @endif
+
+                    <button type="submit" class="btn btn-primary px-4 modern-btn">
+                        Login
+                    </button>
+                </div>
+            </form>
+
+            <!-- FOOTER -->
+            <div class="footer-text text-center mt-4 small text-muted">
+                &copy; {{ date('Y') }} Information & Communication Technology (ICTU)
+            </div>
+
+        </div>
     </div>
 </div>
 

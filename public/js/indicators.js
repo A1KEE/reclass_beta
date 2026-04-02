@@ -1,7 +1,21 @@
 /* =======================================
 GLOBAL FUNCTIONS
 ======================================= */
+function toggleSubmitButtonByResult() {
+    const finalText = document.getElementById("finalRating")?.textContent || "";
+    const submitBtn = document.getElementById("submitBtn");
 
+    if (!submitBtn) return;
+
+    // ❌ Disable ONLY if IN PROGRESS
+    if (finalText.includes("IN PROGRESS")) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "⏳ In Progress (Complete requirements)";
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = "💾 Submit Application";
+    }
+}
 function syncRow(id){
 
     const o = document.querySelector(`input[name="ppst[${id}][O]"]`);
@@ -165,64 +179,83 @@ function calculateFinalRating(totalS = 0, totalVS = 0){
         const totalNCOI = ncoiO + ncoiVS;
 
         if(coiO < 6){
-            finalEl.textContent = "DISQUALIFIED ❌ - Need 6 COI O";
+            finalEl.textContent = "DISQUALIFIED ❌ - Need 6 COI Outstanding";
             resultInput.value = "disqualified";
+            toggleSubmitButtonByResult();
             return;
         }
 
         if(ncoiO < 4){
-            finalEl.textContent = "DISQUALIFIED ❌ - Need 4 NCOI O";
+            finalEl.textContent = "DISQUALIFIED ❌ - Need 4 NCOI Outstanding";
             resultInput.value = "disqualified";
+
+            toggleSubmitButtonByResult();
             return;
         }
 
         if(totalCOI < 21 || totalNCOI < 16){
             finalEl.textContent = "IN PROGRESS ⏳";
             resultInput.value = "draft";
+
+            toggleSubmitButtonByResult();
             return;
         }
 
         finalEl.textContent = "QUALIFIED ✅";
         resultInput.value = "qualified";
+
+        toggleSubmitButtonByResult();
         return;
     }
 
     // =============================
-    // NCOI LOGIC
+    // REQUIRED VALUES
     // =============================
+    const requiredCOI = (req.coiO || 0) + (req.coiVS || 0);
+    const actualCOI = coiO + coiVS;
+
     const requiredNCOI = (req.ncoiO || 0) + (req.ncoiVS || 0);
     const actualNCOI = ncoiO + ncoiVS;
 
-    const isHighPosition = ["Teacher VI","Teacher VII","Master Teacher I","Master Teacher II","Master Teacher III"].includes(position);
+    const isHighPosition = [
+        "Teacher VI",
+        "Teacher VII",
+        "Master Teacher I",
+        "Master Teacher II",
+        "Master Teacher III"
+    ].includes(position);
 
     let maxAllowedVS = requiredNCOI - ncoiO;
 
-    if(isHighPosition && ncoiVS > maxAllowedVS){
-        warningEl.textContent = "⚠ Too many VS compared to O";
-    }else{
-        warningEl.textContent = "";
-    }
-
-    let remaining = Math.max(requiredNCOI - actualNCOI, 0);
-
-    progressEl.textContent = remaining > 0 
-        ? `Remaining NCOI: ${remaining}` 
-        : `NCOI complete ✔`;
-
-    if(actualNCOI < requiredNCOI){
+    // =============================
+    // 1. IN PROGRESS CHECK (FIRST)
+    // =============================
+    if (actualCOI < requiredCOI || actualNCOI < requiredNCOI) {
         finalEl.textContent = "IN PROGRESS ⏳";
         resultInput.value = "draft";
+
+        toggleSubmitButtonByResult();
         return;
     }
 
-    if(isHighPosition && ncoiVS > maxAllowedVS){
+    // =============================
+    // 2. DISQUALIFIED RULES
+    // =============================
+    if (isHighPosition && ncoiVS > maxAllowedVS) {
         finalEl.textContent = "DISQUALIFIED ❌ - VS > O";
         resultInput.value = "disqualified";
+
+        toggleSubmitButtonByResult();
         return;
     }
 
+    // =============================
+    // 3. QUALIFIED
+    // =============================
     finalEl.textContent = "QUALIFIED ✅";
     resultInput.value = "qualified";
+
+    toggleSubmitButtonByResult();
 }
 
 
@@ -269,4 +302,5 @@ ON LOAD
 
 document.addEventListener("DOMContentLoaded", function(){
     initPPST();
+    toggleSubmitButtonByResult();
 });

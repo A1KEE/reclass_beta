@@ -242,7 +242,50 @@
         font-size: 11px;
         color: #aaa;
     }
+#applicantsTable {
+    font-size: 12px;
+}
 
+#applicantsTable thead th,
+#applicantsTable tbody td {
+    padding: 4px 6px;
+}
+#pageTitle {
+    margin-left: 12px;
+}
+/* AVATAR CIRCLE */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* USER TEXT */
+.admin-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-role {
+    font-size: 11px;
+    color: #aaa;
+}
+
+/* COLLAPSED STATE */
+.sidebar-collapsed .user-text {
+    display: none;
+}
+
+.sidebar-collapsed .sidebar-user {
+    justify-content: center;
+}
     /* =========================
        MOBILE FIX
     ========================= */
@@ -298,38 +341,38 @@
     <!-- FOOTER -->
 <div class="sidebar-footer">
 
-    <div class="user-card text-white sidebar-user text-center">
+    @php
+    $name = auth()->user()->name ?? 'Admin';
+    $words = explode(' ', $name);
+    $initials = strtoupper(substr($words[0],0,1) . (isset($words[1]) ? substr($words[1],0,1) : ''));
+@endphp
 
-        <div class="user-info mb-2">
+<div class="user-card sidebar-user d-flex align-items-center">
 
-            <div class="user-icon mb-1">
-                👤
-            </div>
+    <!-- AVATAR -->
+    <div class="avatar-circle">
+        {{ $initials }}
+    </div>
 
-            <div class="user-text">
-                <strong class="admin-name">
-                    {{ auth()->user()->name ?? 'Admin' }}
-                </strong><br>
-
-                <small class="admin-role">Administrator</small>
-            </div>
-
+    <!-- USER INFO -->
+    <div class="user-text ms-2">
+        <div class="admin-name">
+            {{ $name }}
         </div>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button class="btn btn-sm btn-danger btn-block logout-btn">
-                <i class="bi bi-box-arrow-right"></i>
-                <span class="logout-text">Logout</span>
-            </button>
-
-        </form>
-
+        <small class="admin-role">Administrator</small>
     </div>
 
 </div>
 
+<form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button class="btn btn-sm btn-danger btn-block mt-2">
+        <i class="bi bi-box-arrow-right"></i>
+        <span class="logout-text">Logout</span>
+    </button>
+</form>
+    </div>
+</div>
 </div>
 
 <!-- CONTENT -->
@@ -337,20 +380,26 @@
 
     <div class="topbar d-flex justify-content-between align-items-center">
 
+    <!-- LEFT: TOGGLE + TITLE -->
+    <div class="d-flex align-items-center gap-2">
         <button class="btn btn-sm btn-dark" id="toggleSidebar">
             <i class="bi bi-list"></i>
         </button>
 
-        <div class="text-end small">
-           <div>
-            <strong>Date:</strong> <span id="liveDate"></span>
-        </div>
-        <div>
-            <strong>Time:</strong> <span id="liveTime"></span>
-        </div>
-        </div>
-
+        <h6 class="mb-0 fw-bold" id="pageTitle">
+            @yield('page-title', 'Dashboard')
+        </h6>
     </div>
+
+    <!-- RIGHT: DATE & TIME -->
+    <div class="text-end small">
+    <div>Philippine Standard Time:</div>
+    <div>
+        <strong id="pstDateTime"></strong>
+    </div>
+</div>
+</div>
+
 
     <div class="mt-3">
         @yield('content')
@@ -392,29 +441,23 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <script>
-    // =========================
-// LIVE DATE & TIME
-// =========================
-function updateDateTime() {
+  function updateDateTime() {
     const now = new Date();
 
-    // DATE FORMAT: March 29 2026
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const dateStr = now.toLocaleDateString('en-US', options);
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    };
 
-    // TIME FORMAT: 9:19 PM
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formatted = now.toLocaleString('en-US', options);
 
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-
-    const timeStr = `${hours}:${minutes} ${ampm}`;
-
-    document.getElementById('liveDate').textContent = dateStr;
-    document.getElementById('liveTime').textContent = timeStr;
+    document.getElementById('pstDateTime').textContent = formatted;
 }
 
 updateDateTime();

@@ -3,7 +3,9 @@
 @section('content')
 <div class="container-fluid mt-3">
 
-    <h4 class="mb-4 fw-bold">⚙️ Settings</h4>
+    <h4 class="mb-4 fw-bold">@section('page-title')
+⚙️ Settings
+@endsection</h4>
 
     <div class="card shadow-sm border-0 p-4">
 

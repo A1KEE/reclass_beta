@@ -3,7 +3,9 @@
 @section('content')
 <div class="container-fluid mt-3">
 
-    <h5 class="mb-4 fw-bold">📊 Admin Dashboard</h5>
+    <h5 class="mb-4 fw-bold">@section('page-title')
+📊 Admin Dashboard
+@endsection</h5>
 
     <!-- STATS CARDS -->
     <div class="row stats-row">

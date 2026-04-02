@@ -13,19 +13,21 @@ class ApplicationStatusMail extends Mailable
 
     public $application;
     public $finalResultText;
+    public $password;
 
-    public function __construct($application, $finalResult)
-{
-    $this->application = $application;
+     public function __construct($application, $finalResult, $password = null)
+    {
+        $this->application = $application;
+        $this->password = $password;
 
-    if ($finalResult === 'qualified') {
-        $this->finalResultText = 'MET ✅';
-    } elseif ($finalResult === 'disqualified') {
-        $this->finalResultText = 'NOT MET ❌';
-    } else {
-        $this->finalResultText = 'IN PROGRESS ⏳';
+        if ($finalResult === 'qualified') {
+            $this->finalResultText = 'MET ✅';
+        } elseif ($finalResult === 'disqualified') {
+            $this->finalResultText = 'NOT MET ❌';
+        } else {
+            $this->finalResultText = 'IN PROGRESS ⏳';
+        }
     }
-}
 
     public function build()
     {

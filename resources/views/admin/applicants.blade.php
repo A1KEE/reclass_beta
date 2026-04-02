@@ -3,7 +3,9 @@
 @section('content')
 <div class="container-fluid mt-3">
 
-    <h4 class="mb-3 fw-bold">👥 Applicants</h4>
+    <h3 class="mb-3 fw-bold">@section('page-title')
+👥 Applicants
+@endsection</h3>
 
     <div class="card shadow-sm border-0 p-3">
 
@@ -86,6 +88,7 @@ $(document).ready(function () {
         pageLength: 5,
         lengthMenu: [5, 10, 25, 50],
         ordering: true,
+
         language: {
             search: "🔍 Search:",
             lengthMenu: "Show _MENU_ entries",
